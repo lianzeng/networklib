@@ -14,6 +14,7 @@ CXX=g++
 
 TestEchoClient.out: $(TestDir)/TestEchoClient.o $(libname)
 	$(CXX) ${LDFLAGS} -o $@ $^ 
+	@echo " build finished ok !"
 
 
 $(libname):

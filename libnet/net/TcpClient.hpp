@@ -4,16 +4,21 @@
 
 #include "EventLoop.hpp"
 #include "InetAddress.hpp"
-
+#include <memory>
 
 namespace net
 {
+
+class Connector;
+using ConnectorPtr = std::shared_ptr<Connector>;
 
 class TcpClient
 {
 public:
 TcpClient(EventLoop* loop, const InetAddress& serverAddr);
  ~TcpClient(); 
+void connect();
+
 
 private:
 TcpClient(const TcpClient&) = delete;
@@ -21,7 +26,7 @@ TcpClient& operator=(const TcpClient&) = delete;
 
 
 EventLoop* loop_;
-
+ConnectorPtr connector_;
 };
 
 }

@@ -1,7 +1,10 @@
 #include <iostream>
+#include <string>
 #include "EventLoop.hpp"
 #include "InetAddress.hpp"
 #include "TcpClient.hpp"
+#include "TcpConnection.hpp"
+#include "Buffer.hpp"
 
 using std::cout;
 using namespace net;
@@ -17,16 +20,29 @@ public:
 
   void connect()
   {
+    client_.connect();
   }
   
 private:
+
+  void onConnection(const TcpConnectionPtr& conn)
+  {
+    conn->send("connected!\n");
+  }
+
+  void onMessage(const TcpConnectionPtr& conn, Buffer* buf)
+  {
+    std::string msg(buf->retrieveAllAsString());
+    cout<< msg ;
+    conn->send("hello!\n");
+  }
 
   EchoClient(const EchoClient&) = delete;
   EchoClient& operator=(const EchoClient&) = delete;
   
 
-EventLoop* loop_;  
-TcpClient client_;
+  EventLoop* loop_;  
+  TcpClient client_;
 };
 
 int main(int argc, char* argv[])
@@ -46,4 +62,7 @@ int main(int argc, char* argv[])
   EchoClient client(&loop, serverAddr);
   client.connect();
   loop.loop();  
+
+  cout <<"\n TestEchoClient  ok.  " <<"\n"; 
+  return 0;
 }
