@@ -9,6 +9,8 @@ TcpClient::TcpClient(EventLoop* loop, const InetAddress& serverAddr)
 {
 }
 
-
+TcpClient::~TcpClient()
+{
+}
 
 }

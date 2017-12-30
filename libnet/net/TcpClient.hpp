@@ -13,7 +13,7 @@ class TcpClient
 {
 public:
 TcpClient(EventLoop* loop, const InetAddress& serverAddr);
-  
+ ~TcpClient(); 
 
 private:
 TcpClient(const TcpClient&) = delete;

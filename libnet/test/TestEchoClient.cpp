@@ -33,7 +33,8 @@ int main(int argc, char* argv[])
 {
   if(argc <= 1)
   {
-    cout <<"Usage:  " << argv[0] <<  "  host_ip " <<"\n";  
+    cout <<"Usage:  " << argv[0] <<  "  host_ip " <<"\n"; 
+    return -1;
   }
 
   const uint16_t port = 2000;

@@ -8,6 +8,13 @@ EventLoop::EventLoop()
 
 }
 
+EventLoop::~EventLoop()
+{
+}
 
+void EventLoop::loop()
+{
+
+}
 
 }

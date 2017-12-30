@@ -8,7 +8,9 @@ class EventLoop
 {
 public:
 EventLoop();
+~EventLoop();
 
+void loop();
 
 private:
   EventLoop(const EventLoop&) = delete;
