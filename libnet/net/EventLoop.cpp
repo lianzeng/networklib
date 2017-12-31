@@ -1,5 +1,5 @@
 #include "EventLoop.hpp"
-#include <cassert>
+
 
 namespace
 {

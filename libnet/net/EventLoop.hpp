@@ -4,6 +4,7 @@
 #include "CurrentThread.hpp"
 #include <mutex>
 #include <vector>
+#include <cassert>
 
 namespace net
 {
@@ -22,6 +23,11 @@ void loop();
  otherwise store in the task queue.
 Safe to call from any threads.*/
 void runInLoop(Functor&& cb);
+
+void assertInLoopThread() const
+{
+  if(!isInLoopThread()) assert(0);
+}
 
 private:
 

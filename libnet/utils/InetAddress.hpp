@@ -8,6 +8,7 @@
 #include <arpa/inet.h>
 //#include <sys/socket.h>
 #include <cassert>
+#include <type_traits>
 
 class InetAddress
 {
@@ -18,6 +19,19 @@ public:
     convertIpAddr(ip, port);
   }
 
+  sa_family_t family() const { return addr.sin_family; }
+  const struct sockaddr* getSockAddr() const 
+  { 
+   //sockaddr is used for bind/connect, sockaddr_in has meaningful member;
+    static_assert(sizeof(struct sockaddr) == sizeof(struct sockaddr_in), "sockaddr,sockaddr_in not same size");
+    return (const struct sockaddr*)&addr; 
+  }
+
+ ~InetAddress()  = default;
+ InetAddress(const InetAddress&) = default;
+ InetAddress& operator=(const InetAddress&) = default;
+
+ 
 private:
   void convertIpAddr(const std::string& ip, uint16_t port)
   {
