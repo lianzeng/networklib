@@ -12,3 +12,5 @@ linux multi thread programming in C++11, refer to muduo lib.
 
 5)the tcp server has 1 acceptor thread + event_loop_thread_pool;
 
+6)test cases could run independently, with valgrind memory detect;
+
