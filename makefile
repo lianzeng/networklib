@@ -1,3 +1,5 @@
+#usage: make TestEchoClient.out
+#debug example: gdb --args ./TestEchoClient.out 127.0.0.1
 
 
 libname := libnet.a

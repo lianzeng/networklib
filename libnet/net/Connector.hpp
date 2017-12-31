@@ -16,6 +16,9 @@ Connector(EventLoop* loop, const InetAddress& serverAddr);
 void start();
 
 private:
+void startInloop();
+
+
 Connector(const Connector&) = delete;
 Connector& operator=(const Connector&) = delete;
 
