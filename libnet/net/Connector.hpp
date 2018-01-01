@@ -3,10 +3,12 @@
 #define  _CONNECTOR_HPP
 
 #include "InetAddress.hpp"
+#include <memory>
 
 namespace net
 {
 class EventLoop;
+class Channel;
 
 class Connector
 {
@@ -23,6 +25,9 @@ void connect();
 void connecting(int sockfd);
 void retry(int sockfd);
 
+void handleWrite();
+void handleError();
+
 void setState(States s){state_ = s;}
 
 Connector(const Connector&) = delete;
@@ -31,6 +36,8 @@ Connector& operator=(const Connector&) = delete;
 EventLoop* loop_;
 InetAddress serverAddr_;
 States state_;
+std::unique_ptr<Channel> channel_;
+
 };
 
 }

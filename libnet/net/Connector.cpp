@@ -1,5 +1,6 @@
 #include "Connector.hpp"
 #include "EventLoop.hpp"
+#include "Channel.hpp"
 #include <functional>
 #include <SocketsOps.hpp>
 #include <iostream>
@@ -74,11 +75,24 @@ void Connector::connect()
 void Connector::connecting(int sockfd)
 {  
    setState(States::Connecting);
+   assert(!channel_);
+   channel_.reset(new Channel(loop_, sockfd));
+   channel_->setWriteCallback(std::bind(&Connector::handleWrite, this));
+   channel_->setErrorCallback(std::bind(&Connector::handleError, this));
+   channel_->enableWriting();//when complete 3time-handshake, able to write.
 }
 
 void Connector::retry(int sockfd)
 {
   std::cout <<"\n Connector::retry  "  <<"\n";
+}
+
+void Connector::handleWrite()
+{
+}
+
+void Connector::handleError()
+{
 }
 
 

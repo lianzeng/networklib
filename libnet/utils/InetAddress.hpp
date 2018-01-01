@@ -22,8 +22,8 @@ public:
   sa_family_t family() const { return addr.sin_family; }
   const struct sockaddr* getSockAddr() const 
   { 
-   //sockaddr is used for bind/connect, sockaddr_in has meaningful member;
-    static_assert(sizeof(struct sockaddr) == sizeof(struct sockaddr_in), "sockaddr,sockaddr_in not same size");
+   //sockaddr is used for bind/connect, whereas sockaddr_in has meaningful member;
+    static_assert(sizeof(struct sockaddr) == sizeof(struct sockaddr_in), "struct sockaddr,sockaddr_in not same size");
     return (const struct sockaddr*)&addr; 
   }
 
