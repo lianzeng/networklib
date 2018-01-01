@@ -2,14 +2,22 @@
 #define _NET_EVENT_LOOP_HPP
 
 #include "CurrentThread.hpp"
+#include "Timestamp.hpp"
 #include <mutex>
 #include <vector>
 #include <cassert>
+#include <atomic>
+#include <memory>
 
 namespace net
 {
 
+class Channel;
+class PollerBase;
+
+
 using Functor = std::function<void()>;
+
 
 class EventLoop
 {
@@ -37,6 +45,7 @@ bool isInLoopThread() const
   return threadId_ == currentThread::tid();
 }
 
+void doPendingFunctors();
 
   EventLoop(const EventLoop&) = delete;
   EventLoop& operator=(const EventLoop&) = delete;
@@ -45,7 +54,14 @@ bool isInLoopThread() const
  const pid_t threadId_;
  
  std::mutex mutex_;
- std::vector<Functor> pendingFunctors_;//guarded by mutex_
+ std::vector<Functor> pendingFunctors_;//guarded by mutex_, because accessed by multi-threads;
+
+ std::unique_ptr<PollerBase> poller_;
+
+ std::atomic<bool> quit_;
+
+ using ChannelList = std::vector<Channel*>;
+ ChannelList activeChannels_;
  
 };
 

@@ -2,7 +2,7 @@
 #define  _TIME_STAMP_HPP
 
 #include <cstdint>
-
+#include <sys/time.h>
 
 /// Time stamp in UTC, in microseconds resolution.
 /// This class is immutable.
@@ -10,13 +10,25 @@
 class Timestamp
 {
 public:
-Timestamp() = default;
+Timestamp(int64_t value):microSecondsSinceEpoch_(value) 
+{
+}
+
 ~Timestamp() = default;
+
+
+static Timestamp now()
+{
+  struct timeval tv;
+  gettimeofday(&tv, nullptr);
+  int64_t seconds = tv.tv_sec;
+  return Timestamp(seconds * MicroSecondsPerSecond + tv.tv_usec);
+}
 
 Timestamp(const Timestamp&) = default;
 Timestamp& operator=(const Timestamp&) = default;
 
-static const int kMicroSecondsPerSecond = 1000 * 1000;
+static const int MicroSecondsPerSecond = 1000 * 1000;
 
 private:
 int64_t microSecondsSinceEpoch_;

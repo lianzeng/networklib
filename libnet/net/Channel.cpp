@@ -21,7 +21,6 @@ Channel:: ~Channel()
 
 void Channel::handleEvent(Timestamp receiveTime)
 {
-  eventHandling_ = true;
   
   if ((revents_ & POLLHUP) && !(revents_ & POLLIN))
   {    
@@ -48,7 +47,7 @@ void Channel::handleEvent(Timestamp receiveTime)
     if (writeCallback_) writeCallback_();
   }
   
-  eventHandling_ = false;
+  std::cout << "handleEvent " <<std::hex<<revents_ <<"\n";
   
 }
 

@@ -24,6 +24,9 @@ public:
  
   void enableWriting(){}
 
+  void set_revents(int event){revents_ = event;}
+  int fd() const {return fd_; }//debug
+
   void setReadCallback(ReadEventCallback&& cb){ readCallback_ = std::move(cb); }
   void setWriteCallback(EventCallback&& cb) {writeCallback_ = std::move(cb);}
   void setCloseCallback(EventCallback&& cb){closeCallback_ = std::move(cb); }
@@ -43,7 +46,6 @@ EventCallback errorCallback_;
 EventCallback closeCallback_;
 ReadEventCallback readCallback_;
 
-bool eventHandling_ = false;
 
 
 };
