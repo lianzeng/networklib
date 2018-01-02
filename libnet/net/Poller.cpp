@@ -66,7 +66,6 @@ void Poller::fillActiveChannels(int numEvents , ChannelList& activeChannels) con
 void Poller::updateChannel(Channel* channel)
 {
   PollerBase::assertInLoopThread();
-  std::cout << "fd = " << channel->fd() << " events = " << channel->events() <<"\n";
   
   if (channel->index() < 0)
     addNewChannel(channel);
@@ -84,10 +83,14 @@ void Poller::addNewChannel(Channel* channel)
   pollfdList_.push_back(pfd);
   channel->set_index(static_cast<int>(pollfdList_.size() - 1));
   channelMap_[channel->fd()] = channel;
+  
+  std::cout << " addNewChannel: fd = " << channel->fd() << " events = " << channel->events() <<"\n";
 }
 
 void Poller::updateExistChannel(Channel* channel)
 {
+  std::cout << " updateExistChannel: fd = " << channel->fd() << " events = " << channel->events() <<"\n";
+  
   auto& pfd = pollfdList_[channel->index()];
   assert(pfd.fd == channel->fd() || pfd.fd == -channel->fd()-1);
   

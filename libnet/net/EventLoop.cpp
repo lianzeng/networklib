@@ -52,6 +52,8 @@ void EventLoop::loop()
 
 void EventLoop::doPendingFunctors()
 {
+  std::cout <<"  doPendingFunctors : \n";  
+  
   decltype(pendingFunctors_) functors;
   {
     std::lock_guard< std::mutex> lock(mutex_);
@@ -59,9 +61,7 @@ void EventLoop::doPendingFunctors()
   }
 
   for(auto& func : functors)
-    func();
-    
-  std::cout <<"  doPendingFunctors\n";  
+    func();    
 }
 
 void EventLoop::runInLoop(Functor&& cb)
@@ -91,6 +91,7 @@ void EventLoop::removeChannel(Channel* cn)
   assert(cn->ownerLoop() == this);
   assertInLoopThread();
   poller_->removeChannel(cn);
+  std::cout << " removeChannel: fd = " << cn->fd() <<"\n";
 }
 
 

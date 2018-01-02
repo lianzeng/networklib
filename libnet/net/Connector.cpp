@@ -38,10 +38,10 @@ void Connector::connect()
   switch (savedErrno)
   {
     case 0:
-    case EINPROGRESS:
+    case EINPROGRESS: //EINPROGRESS  = 115   
     case EINTR:
     case EISCONN:
-      std::cout <<"\n connecting  " << savedErrno <<"\n";
+      std::cout <<"\n connecting  " <<"\n";
       connecting(sockfd);
       break;
 
@@ -86,6 +86,7 @@ void Connector::connecting(int sockfd)
 
 void Connector::handleWrite()
 {
+  std::cout << "Connector::handleWrite" << "\n";
 }
 
 void Connector::handleError()
@@ -117,6 +118,7 @@ void Connector::retry(int sockfd)
 
 void Connector::freeChannel()
 {
+  std::cout <<"\n freeChannel resouce: fd =  "  <<channel_->fd() <<"\n";
   channel_.reset();//unique_ptr.reset(), free resource.
 }
 
