@@ -13,7 +13,8 @@ Channel::Channel(EventLoop* loop, int fd):
   loop_(loop),
   fd_(fd),
   events_(0),
-  revents_(0)
+  revents_(0),
+  index_(-1)
 {
 }
 
@@ -24,7 +25,7 @@ Channel:: ~Channel()
 
 
 void Channel::handleEvent(Timestamp receiveTime)
-{
+{//value refer to: https://github.com/torvalds/linux/blob/ead751507de86d90fa250431e9990a8b881f713c/include/uapi/asm-generic/poll.h
   
   if ((revents_ & POLLHUP) && !(revents_ & POLLIN))
   {    

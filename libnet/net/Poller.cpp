@@ -65,10 +65,64 @@ void Poller::fillActiveChannels(int numEvents , ChannelList& activeChannels) con
 
 void Poller::updateChannel(Channel* channel)
 {
+  PollerBase::assertInLoopThread();
+  std::cout << "fd = " << channel->fd() << " events = " << channel->events() <<"\n";
+  
+  if (channel->index() < 0)
+    addNewChannel(channel);
+  else
+    updateExistChannel(channel);
 }
+
+
+void Poller::addNewChannel(Channel* channel)
+{
+  struct pollfd pfd;
+  pfd.fd = channel->fd();
+  pfd.events = static_cast<short>(channel->events());
+  pfd.revents = 0;
+  pollfdList_.push_back(pfd);
+  channel->set_index(static_cast<int>(pollfdList_.size() - 1));
+  channelMap_[channel->fd()] = channel;
+}
+
+void Poller::updateExistChannel(Channel* channel)
+{
+  auto& pfd = pollfdList_[channel->index()];
+  assert(pfd.fd == channel->fd() || pfd.fd == -channel->fd()-1);
+  
+  if(channel->isNoneEvent())
+    pfd.fd = -channel->fd() - 1;
+  else
+  {
+    pfd.fd = channel->fd();
+    pfd.events = static_cast<short>(channel->events());
+    pfd.revents = 0;
+  }
+}
+
 
 void Poller::removeChannel(Channel* channel)
 {
+  PollerBase::assertInLoopThread();
+  assert(channelMap_.find(channel->fd()) != channelMap_.end());
+  channelMap_.erase(channel->fd());
+
+  auto idx = channel->index();
+  assert(0 <= idx && idx < pollfdList_.size());
+  if(static_cast<size_t>(idx) == pollfdList_.size() - 1)//remove last elemet
+  {
+    pollfdList_.pop_back();
+  }
+  else//override it by last
+  {
+    pollfdList_[idx] = pollfdList_.back();
+    pollfdList_.pop_back();
+    auto fd = pollfdList_[idx].fd;
+    if(fd < 0) fd = -(fd + 1);
+    channelMap_[fd]->set_index(idx);
+  }
+  
 }
 
 }

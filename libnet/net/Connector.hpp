@@ -24,9 +24,12 @@ void startInloop();
 void connect();
 void connecting(int sockfd);
 void retry(int sockfd);
+void freeChannel();
 
 void handleWrite();
 void handleError();
+
+void removeAndFreeChannel();
 
 void setState(States s){state_ = s;}
 

@@ -22,6 +22,8 @@ virtual  void removeChannel(Channel* channel) override;
 
 private:
 void fillActiveChannels(int numEvents , ChannelList& activeChannels) const;
+void addNewChannel(Channel* channel);
+void updateExistChannel(Channel* channel);
 
 using PollFdList = std::vector<struct pollfd>;
 PollFdList pollfdList_;

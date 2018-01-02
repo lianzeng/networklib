@@ -82,10 +82,7 @@ void Connector::connecting(int sockfd)
    channel_->enableWriting();//when complete 3time-handshake, able to write.
 }
 
-void Connector::retry(int sockfd)
-{
-  std::cout <<"\n Connector::retry  "  <<"\n";
-}
+
 
 void Connector::handleWrite()
 {
@@ -93,7 +90,34 @@ void Connector::handleWrite()
 
 void Connector::handleError()
 {
+  std::cout << "Connector::handleError" << "\n";
+  if (state_ == States::Connecting)
+  {
+    removeAndFreeChannel();
+    //int err = sockets::getSocketError(channel_->fd());
+    //std::cout  << "SO_ERROR = " << err << " " << strerror_tl(err);
+    retry(channel_->fd());
+  }
 }
 
+void Connector::removeAndFreeChannel()
+{
+  channel_->disableEvents();
+  channel_->removeSelf();
+  loop_->queueInLoop(std::bind(&Connector::freeChannel, this));//// Can't free channel here, because we are inside Channel::handleEvent
+}
+
+void Connector::retry(int sockfd)
+{
+  std::cout <<"\n Connector::retry  "  <<"\n";
+  sockets::close(channel_->fd());
+  setState(States::Disconnected);
+  //loop_->runAfter
+}
+
+void Connector::freeChannel()
+{
+  channel_.reset();//unique_ptr.reset(), free resource.
+}
 
 }

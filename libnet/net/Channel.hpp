@@ -19,18 +19,28 @@ public:
 
   Channel(EventLoop* loop, int fd);
   ~Channel();
-
+  EventLoop* ownerLoop() {return loop_;}
   void handleEvent(Timestamp receiveTime);
- 
-  void enableWriting(){events_ |= WRITE_EVENT; update();}
 
-  void set_revents(int event){revents_ = event;}
-  int fd() const {return fd_; }//debug
+  void removeSelf(){loop_->removeChannel(this);}
+  
+  void enableWriting(){events_ |= WRITE_EVENT; update();}
+  void disableWriting(){events_ &= ~WRITE_EVENT; update();}
+  void enableReading(){events_ |= READ_EVENT; update();}
+  void disableReading(){events_ &= ~READ_EVENT; update();}
+  void disableEvents() { events_ = NONE_EVENT; update(); }
+  bool isNoneEvent() const {return events_ == NONE_EVENT;}
 
   void setReadCallback(ReadEventCallback&& cb){ readCallback_ = std::move(cb); }
   void setWriteCallback(EventCallback&& cb) {writeCallback_ = std::move(cb);}
   void setCloseCallback(EventCallback&& cb){closeCallback_ = std::move(cb); }
   void setErrorCallback(EventCallback&& cb) {errorCallback_ = std::move(cb);}
+
+  int fd() const {return fd_; }
+  int events() const {return events_;}
+  void set_revents(int event){revents_ = event;}
+  void set_index(int idx) {index_ = idx;}
+  int index() const {return index_;}
 
 private:
 
@@ -47,11 +57,13 @@ EventLoop* loop_;
 int        fd_;
 int        events_;
 int        revents_; // it's the received event types of epoll or poll
+int        index_;//used as arrayIndex(Poll) and state(Epoll)
 
+ReadEventCallback readCallback_;
 EventCallback writeCallback_;
 EventCallback errorCallback_;
 EventCallback closeCallback_;
-ReadEventCallback readCallback_;
+
 
 static const int WRITE_EVENT;//benefit: to avoid include poll.h in this hpp
 static const int READ_EVENT;
