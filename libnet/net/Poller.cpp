@@ -22,10 +22,11 @@ Poller::~Poller()
 }
 
 
-Timestamp Poller::poll(int timeoutMs, ChannelList& activeChannels) 
+PollerBase::ChannelList  Poller::poll(const int timeoutMs, Timestamp& retTime)
 {
-  int numEvents = ::poll(pollfdList_.data(), pollfdList_.size(), timeoutMs);
-  Timestamp now(Timestamp::now());
+  ChannelList activeChannels;
+  int numEvents = ::poll(pollfdList_.data(), pollfdList_.size(), timeoutMs);//int ppoll(struct pollfd *fds, nfds_t nfds, const struct timespec *, const sigset_t *sigmask);
+  retTime = Timestamp::now();
   
   if(numEvents > 0)
   {
@@ -41,7 +42,7 @@ Timestamp Poller::poll(int timeoutMs, ChannelList& activeChannels)
     if(errno != EINTR)
       std::cout<< " poll() : " <<errno << "  Error happend !\n";  
   }
-  return now;
+  return activeChannels;
 }
 
 void Poller::fillActiveChannels(int numEvents , ChannelList& activeChannels) const

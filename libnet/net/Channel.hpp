@@ -22,7 +22,7 @@ public:
 
   void handleEvent(Timestamp receiveTime);
  
-  void enableWriting(){}
+  void enableWriting(){events_ |= WRITE_EVENT; update();}
 
   void set_revents(int event){revents_ = event;}
   int fd() const {return fd_; }//debug
@@ -33,6 +33,13 @@ public:
   void setErrorCallback(EventCallback&& cb) {errorCallback_ = std::move(cb);}
 
 private:
+
+void update()
+{
+  loop_->updateChannel(this);
+}
+
+
 Channel(const Channel&) = delete;
 Channel& operator=(const Channel&) = delete;
 
@@ -46,7 +53,9 @@ EventCallback errorCallback_;
 EventCallback closeCallback_;
 ReadEventCallback readCallback_;
 
-
+static const int WRITE_EVENT;//benefit: to avoid include poll.h in this hpp
+static const int READ_EVENT;
+static const int NONE_EVENT;
 
 };
 

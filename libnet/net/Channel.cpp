@@ -5,6 +5,10 @@
 namespace net
 {
 
+const int Channel::WRITE_EVENT = POLLOUT;
+const int Channel::READ_EVENT   = POLLIN | POLLPRI;
+const int Channel::NONE_EVENT   = 0;
+
 Channel::Channel(EventLoop* loop, int fd):
   loop_(loop),
   fd_(fd),
@@ -50,5 +54,9 @@ void Channel::handleEvent(Timestamp receiveTime)
   std::cout << "handleEvent " <<std::hex<<revents_ <<"\n";
   
 }
+
+
+
+
 
 }

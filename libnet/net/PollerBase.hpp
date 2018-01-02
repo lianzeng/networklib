@@ -24,7 +24,7 @@ virtual ~PollerBase();
    static PollerBase* newDefaultPoller(EventLoop* loop);
    
 
-  virtual Timestamp poll(int timeoutMs, ChannelList& activeChannels) = 0;
+  virtual  ChannelList poll(const int timeoutMs, Timestamp& retTime) = 0;
 
   virtual void updateChannel(Channel* channel) = 0;
 

@@ -27,11 +27,13 @@ EventLoop();
 
 void loop();
 
- /* If in the same loop thread, cb is run immediately.
- otherwise store in the task queue.
-Safe to call from any threads.*/
+ /* If in the same loop thread, cb is run immediately. otherwise store in the task queue.Safe to call from any threads.*/
 void runInLoop(Functor&& cb);
 
+void updateChannel(Channel*);
+
+
+void quit() {quit_ = true;}
 void assertInLoopThread() const
 {
   if(!isInLoopThread()) assert(0);
@@ -40,28 +42,28 @@ void assertInLoopThread() const
 private:
 
 void queueInLoop( Functor&& cb);
+void doPendingFunctors();
+
+
+
 bool isInLoopThread() const
 {
   return threadId_ == currentThread::tid();
 }
 
-void doPendingFunctors();
-
   EventLoop(const EventLoop&) = delete;
   EventLoop& operator=(const EventLoop&) = delete;
 
 
- const pid_t threadId_;
+private:
+ const pid_t threadId_;//indicate  owner thread
  
  std::mutex mutex_;
  std::vector<Functor> pendingFunctors_;//guarded by mutex_, because accessed by multi-threads;
 
  std::unique_ptr<PollerBase> poller_;
 
- std::atomic<bool> quit_;
-
- using ChannelList = std::vector<Channel*>;
- ChannelList activeChannels_;
+ std::atomic<bool> quit_;//enable quit by other thread
  
 };
 

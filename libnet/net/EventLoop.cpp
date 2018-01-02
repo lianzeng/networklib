@@ -1,11 +1,12 @@
 #include "EventLoop.hpp"
 #include "PollerBase.hpp"
 #include "Channel.hpp"
+#include "Timestamp.hpp"
 #include <iostream>
 
 namespace
 {
-__thread net::EventLoop* t_loopInThisThread = nullptr;//one loop per thread
+__thread net::EventLoop* t_loopInThisThread = nullptr;//to gurantee one loop per thread
 const int PollTimeOutMs = 3000;//3seconds
 }
 
@@ -34,12 +35,12 @@ void EventLoop::loop()
   quit_ = false;
   while (!quit_)
   {
-    activeChannels_.clear();
-    auto pollReturnTime = poller_->poll(PollTimeOutMs, activeChannels_);
+    Timestamp returnTime(~0); 
+    auto  activeChannels = poller_->poll(PollTimeOutMs, returnTime);
     
-    for (auto iter = activeChannels_.begin(); iter != activeChannels_.end();  ++iter) // improve: sort channel by priority    
+    for (auto iter = activeChannels.begin(); iter != activeChannels.end();  ++iter) // improve: sort channel by priority    
     {      
-      (*iter)->handleEvent(pollReturnTime);
+      (*iter)->handleEvent(returnTime);
     }
         
     doPendingFunctors();
@@ -78,6 +79,9 @@ void EventLoop::queueInLoop(Functor&& cb)
   
 }
 
-
+void EventLoop::updateChannel(Channel*)
+{
+  
+}
 
 }
