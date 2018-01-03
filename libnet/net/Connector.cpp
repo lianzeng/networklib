@@ -1,9 +1,10 @@
 #include "Connector.hpp"
 #include "EventLoop.hpp"
 #include "Channel.hpp"
+#include "Logging.hpp"
 #include <functional>
 #include <SocketsOps.hpp>
-#include <iostream>
+
 
 namespace net
 {
@@ -41,7 +42,6 @@ void Connector::connect()
     case EINPROGRESS: //EINPROGRESS  = 115   
     case EINTR:
     case EISCONN:
-      std::cout <<"\n connecting  " <<"\n";
       connecting(sockfd);
       break;
 
@@ -60,12 +60,12 @@ void Connector::connect()
     case EBADF:
     case EFAULT:
     case ENOTSOCK:
-      std::cout <<"\n connect error in Connector::connect " << savedErrno <<"\n";
+      LOG_ERROR <<"connect error in Connector::startInLoop " << savedErrno;
       sockets::close(sockfd);
       break;
 
     default:
-      std::cout <<"\n unexpected error  in Connector::connect  " << savedErrno <<"\n";
+      LOG_ERROR<<"Unexpected error in Connector::startInLoop " << savedErrno;
       sockets::close(sockfd);
       break;
   }
@@ -74,6 +74,7 @@ void Connector::connect()
 
 void Connector::connecting(int sockfd)
 {  
+   LOG_TRACE <<"sockfd = "<<sockfd;
    setState(States::Connecting);
    assert(!channel_);
    channel_.reset(new Channel(loop_, sockfd));
@@ -86,12 +87,12 @@ void Connector::connecting(int sockfd)
 
 void Connector::handleWrite()
 {
-  std::cout << "Connector::handleWrite" << "\n";
+  LOG_TRACE << "state =  " << static_cast<int>(state_);
 }
 
 void Connector::handleError()
 {
-  std::cout << "Connector::handleError" << "\n";
+  LOG_ERROR << "state = " << static_cast<int>(state_);
   if (state_ == States::Connecting)
   {
     removeAndFreeChannel();
@@ -110,7 +111,7 @@ void Connector::removeAndFreeChannel()
 
 void Connector::retry(int sockfd)
 {
-  std::cout <<"\n Connector::retry  "  <<"\n";
+  LOG_INFO <<"  ";
   sockets::close(channel_->fd());
   setState(States::Disconnected);
   //loop_->runAfter
@@ -118,7 +119,7 @@ void Connector::retry(int sockfd)
 
 void Connector::freeChannel()
 {
-  std::cout <<"\n freeChannel resouce: fd =  "  <<channel_->fd() <<"\n";
+  LOG_DBG <<" resource: fd =  "  <<channel_->fd();
   channel_.reset();//unique_ptr.reset(), free resource.
 }
 

@@ -25,6 +25,8 @@ static Timestamp now()
   return Timestamp(seconds * MicroSecondsPerSecond + tv.tv_usec);
 }
 
+  int64_t microSecondsSinceEpoch() const { return microSecondsSinceEpoch_; }
+
 Timestamp(const Timestamp&) = default;
 Timestamp& operator=(const Timestamp&) = default;
 
