@@ -25,6 +25,7 @@ LoggerImpl* impl_;
 
 namespace log
 {
+extern const char* strerror_tl(int savedErrno);
 extern LogLevel g_logLevel;
 static inline LogLevel logLevel(){return g_logLevel;}
 }

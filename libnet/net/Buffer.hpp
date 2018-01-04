@@ -21,7 +21,7 @@ Buffer& operator=(const Buffer&) = default;
 std::string retrieveAllAsString();
 
 private:
-
+//std::queue<char> data;
 };
 
 

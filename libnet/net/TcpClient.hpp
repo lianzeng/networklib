@@ -21,6 +21,8 @@ void connect();
 
 
 private:
+void newConnection(int sockfd);// callback
+
 TcpClient(const TcpClient&) = delete;
 TcpClient& operator=(const TcpClient&) = delete;
 

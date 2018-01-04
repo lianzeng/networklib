@@ -11,8 +11,10 @@ namespace sockets
 int createNonblocking(sa_family_t family);
 int connect(int sockfd, const struct sockaddr* addr);
 void close(int sockfd);
-
-
+int getSocketError(int sockfd);
+bool isSelfConnect(int sockfd);
+struct sockaddr_in getPeerAddr(int sockfd);
+struct sockaddr_in getLocalAddr(int sockfd);
 }
 }
 

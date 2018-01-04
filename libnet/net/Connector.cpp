@@ -87,17 +87,38 @@ void Connector::connecting(int sockfd)
 
 void Connector::handleWrite()
 {
-  LOG_TRACE << "state =  " << static_cast<int>(state_);
+  LOG_TRACE <<"fd = "<< channel_->fd() <<" , state =  " << static_cast<int>(state_);
+  if(state_ == States::Connecting)
+  {
+    removeAndFreeChannel();//the life of connect_channel is over, need create new data_channel for same socketfd.
+    auto fd = channel_->fd();
+    int err = sockets::getSocketError(fd);
+    if (err)
+    {
+      LOG_WRN << " SO_ERROR = " << err << " " << log::strerror_tl(err);
+      retry(fd);
+    }
+    else if (sockets::isSelfConnect(fd))
+    {
+      LOG_WRN << " Self connect";
+      retry(fd);
+    }
+    else
+    {
+      setState(States::Connected);
+      newConnectionCallback_(fd);
+    }
+  }
 }
 
 void Connector::handleError()
 {
-  LOG_ERROR << "state = " << static_cast<int>(state_);
+  LOG_ERROR <<"fd = "<< channel_->fd() << " , state = " << static_cast<int>(state_);
   if (state_ == States::Connecting)
   {
     removeAndFreeChannel();
-    //int err = sockets::getSocketError(channel_->fd());
-    //std::cout  << "SO_ERROR = " << err << " " << strerror_tl(err);
+    int err = sockets::getSocketError(channel_->fd());
+    LOG_ERROR<< "SO_ERROR = " << err << " " << log::strerror_tl(err);
     retry(channel_->fd());
   }
 }
@@ -111,7 +132,7 @@ void Connector::removeAndFreeChannel()
 
 void Connector::retry(int sockfd)
 {
-  LOG_INFO <<"  ";
+  LOG_INFO <<" close fd =  "<<channel_->fd();
   sockets::close(channel_->fd());
   setState(States::Disconnected);
   //loop_->runAfter
@@ -119,7 +140,7 @@ void Connector::retry(int sockfd)
 
 void Connector::freeChannel()
 {
-  LOG_DBG <<" resource: fd =  "  <<channel_->fd();
+  LOG_DBG <<"  fd =  "  <<channel_->fd();
   channel_.reset();//unique_ptr.reset(), free resource.
 }
 

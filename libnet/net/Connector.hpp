@@ -13,9 +13,16 @@ class Channel;
 class Connector
 {
 public:
+
+using NewConnectionCallback = std::function<void(int fd)>;
+
 Connector(EventLoop* loop, const InetAddress& serverAddr);
 ~Connector();
+
 void start();
+
+void setCallbackOnConnection(NewConnectionCallback&& cb)
+{ newConnectionCallback_ = std::move(cb); }
 
 private:
 
@@ -40,6 +47,7 @@ EventLoop* loop_;
 InetAddress serverAddr_;
 States state_;
 std::unique_ptr<Channel> channel_;
+NewConnectionCallback newConnectionCallback_;
 
 };
 

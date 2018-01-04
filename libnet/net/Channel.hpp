@@ -8,8 +8,8 @@
 namespace net
 {
 
-/// This class doesn't own the file descriptor.
-/// The file descriptor could be a socket, an eventfd, a timerfd, or a signalfd.
+/// This class doesn't own the fd.
+/// The file descriptor could be a socketfd, an eventfd, a timerfd, or a signalfd.
 class Channel
 {
 public:

@@ -7,7 +7,7 @@
 namespace
 {
 __thread net::EventLoop* t_loopInThisThread = nullptr;//to gurantee one loop per thread
-const int PollTimeOutMs = 3000;//3seconds
+const int PollTimeOutMs = 2000;//2seconds
 }
 
 namespace net

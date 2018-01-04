@@ -17,6 +17,12 @@ LogLevel initLogLevel()
     return LogLevel::TRACE;
 }
 
+__thread char t_errnobuf[512] = {0};
+const char* strerror_tl(int savedErrno)
+{
+  return strerror_r(savedErrno, t_errnobuf, sizeof(t_errnobuf));
+}
+
 LogLevel g_logLevel =  initLogLevel();
 const std::string g_logLevelName[] = {"TRACE ","DEBUG ","INFO  ","WARN  ","ERROR ","FATAL "};
 
