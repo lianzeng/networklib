@@ -30,4 +30,5 @@ clean:
 	rm -rf *.out $(libname)
 	find ./ -name "*.o" | xargs rm
 
-memcheck:valgrind --leak-check=full  ./TestEchoClient.out 127.0.0.1
+memcheck:
+	valgrind --leak-check=full  ./TestEchoClient.out 127.0.0.1
