@@ -60,13 +60,13 @@ void formatTime()
 }
   
 private:
-  class SourceFile //help class: fetch filename from abs path.
+  class FileNameExtractor
   {
   public:
-    explicit SourceFile(const char* filename) 
+    explicit FileNameExtractor(const char* filenameWithPath) 
     {
-      const char* slash = strrchr(filename, '/');
-      const char* data = slash ? (slash + 1) : filename;
+      const char* slash = strrchr(filenameWithPath, '/');
+      const char* data = slash ? (slash + 1) : filenameWithPath;
       auto len = static_cast<size_t>(strlen(data));
       name = std::string(data, len);
     }
@@ -77,7 +77,7 @@ private:
   Timestamp time_;
   LogLevel level_;
   int lineNum_;
-  SourceFile srcfile;
+  FileNameExtractor srcfile;
   LogStream stream_;
 
 };
