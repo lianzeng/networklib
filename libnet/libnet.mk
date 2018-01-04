@@ -12,7 +12,7 @@ VPATH := $(SRC_FOLDERS)
 OBJS := $(SRC_CPP_FILES:%.cpp=%.o)
 AR := ar -rc
 
-CPPFLAGS=-g -std=c++11 -fPIC  $(INC_DIRS)
+CPPFLAGS=-g -std=c++11 -fPIC -Wall -Werror $(INC_DIRS)
 CXX=g++ 
 
 $(Target):${OBJS} 

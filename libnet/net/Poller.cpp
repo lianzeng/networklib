@@ -112,7 +112,7 @@ void Poller::removeChannel(Channel* channel)
   channelMap_.erase(channel->fd());
 
   auto idx = channel->index();
-  assert(0 <= idx && idx < pollfdList_.size());
+  assert(0 <= idx && static_cast<size_t>(idx) < pollfdList_.size());
   if(static_cast<size_t>(idx) == pollfdList_.size() - 1)//remove last elemet
   {
     pollfdList_.pop_back();

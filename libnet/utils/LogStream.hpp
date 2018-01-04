@@ -15,7 +15,7 @@ FixedBuffer(): curr(data_)
 
 void append(const char* buf, size_t len)
 {
-  if(available() > len)
+  if(available() > static_cast<int>(len))
   {
     memcpy(curr, buf, len);
     curr += len;
@@ -66,6 +66,7 @@ self& operator<<(const char* str)
 self& operator<<(char v)
 {
   logBuffer.append(&v, 1);
+  return *this;
 }
 
 self& operator<<(bool v)
