@@ -1,7 +1,7 @@
 
 #include "Poller.hpp"
 #include "Channel.hpp"
-#include <iostream>
+#include "Logging.hpp"
 #include <poll.h>
 
 namespace net
@@ -30,17 +30,17 @@ PollerBase::ChannelList  Poller::poll(const int timeoutMs, Timestamp& retTime)
   
   if(numEvents > 0)
   {
-    std::cout<< " poll() : " << numEvents << " events happend !\n";
+    LOG_TRACE<< " poll() : " << numEvents << " events happend !";
     fillActiveChannels(numEvents, activeChannels);
   }
   else if(numEvents == 0)
   {
-    std::cout<< " poll() : nothing happend !\n";
+    LOG_TRACE<< " poll() : nothing happend !";
   }
   else
   {
     if(errno != EINTR)
-      std::cout<< " poll() : " <<errno << "  Error happend !\n";  
+      LOG_TRACE<< " poll() : " <<errno << "  Error happend !";  
   }
   return activeChannels;
 }
@@ -84,12 +84,12 @@ void Poller::addNewChannel(Channel* channel)
   channel->set_index(static_cast<int>(pollfdList_.size() - 1));
   channelMap_[channel->fd()] = channel;
   
-  std::cout << " addNewChannel: fd = " << channel->fd() << " events = " << channel->events() <<"\n";
+  LOG_TRACE << "  fd = " << channel->fd() << " events = " << channel->events();
 }
 
 void Poller::updateExistChannel(Channel* channel)
 {
-  std::cout << " updateExistChannel: fd = " << channel->fd() << " events = " << channel->events() <<"\n";
+  LOG_TRACE << " fd = " << channel->fd() << " events = " << channel->events();
   
   auto& pfd = pollfdList_[channel->index()];
   assert(pfd.fd == channel->fd() || pfd.fd == -channel->fd()-1);

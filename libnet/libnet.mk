@@ -2,6 +2,7 @@
 #usage: make -f libnet.mk; make clean -f libnet.mk ;
 #ar -t libnet.a  :list out the objs within libnet.a
 #nm libnet.a | c++filt  : list the symbols in libnet.a
+#gcc compile options refer to: https://gcc.gnu.org/onlinedocs/gcc-2.95.2/gcc_2.html#SEC8
 
 Target := libnet.a 
 SRC_FOLDERS := ./net
@@ -12,7 +13,7 @@ VPATH := $(SRC_FOLDERS)
 OBJS := $(SRC_CPP_FILES:%.cpp=%.o)
 AR := ar -rc
 
-CPPFLAGS=-g -std=c++11 -fPIC -Wall -Werror $(INC_DIRS)
+CPPFLAGS=-g -std=c++11 -fPIC -Wall -Werror -O2 -Wshadow -Wpointer-arith  $(INC_DIRS)
 CXX=g++ 
 
 $(Target):${OBJS} 

@@ -54,7 +54,7 @@ self& operator<<(const std::string& str)
   return *this;
 }
 
-self& operator<<(const char* str)
+self& operator<<(const char* str)//ensure str is terminated with null
 {
   if (str)
     logBuffer.append(str, strlen(str));
@@ -73,7 +73,7 @@ self& operator<<(bool v)
 {
   *this << static_cast<char>(v);
   return *this;
-}
+}  self& operator<<(const void* addr) //print obj address  {    char temp[32];    snprintf(temp, sizeof (temp), "%p", addr);    *this<<static_cast<const char*>(temp);    return *this;  }
 
 template<typename T> //T = int, short, long, float, double
 self& operator<<(T v) 

@@ -3,14 +3,16 @@
 
 #include <cstdint>
 #include <sys/time.h>
+#include <utility>
+#include <ctime>
+#include <cstdio>
+#include <cassert>
 
 /// Time stamp in UTC, in microseconds resolution.
-/// This class is immutable.
-/// It's recommended to pass it by value, since it's passed in register on x64.
 class Timestamp
 {
 public:
-Timestamp(int64_t value):microSecondsSinceEpoch_(value) 
+Timestamp(int64_t value):microSeconds(value) 
 {
 }
 
@@ -25,7 +27,28 @@ static Timestamp now()
   return Timestamp(seconds * MicroSecondsPerSecond + tv.tv_usec);
 }
 
-  int64_t microSecondsSinceEpoch() const { return microSecondsSinceEpoch_; }
+  std::pair<int64_t, int64_t>  get() const 
+  {    
+    return {microSeconds/MicroSecondsPerSecond, microSeconds % MicroSecondsPerSecond}; 
+  }
+
+  void formatSeconds(char (&timesec)[32]) const
+  {
+    time_t seconds = static_cast<time_t>(microSeconds/MicroSecondsPerSecond);
+    struct tm tm_time;        
+    ::gmtime_r(&seconds, &tm_time); 
+    int len = snprintf(timesec, sizeof(timesec), "%4d%02d%02d %02d:%02d:%02d",
+                          tm_time.tm_year + 1900, tm_time.tm_mon + 1, tm_time.tm_mday,
+                          tm_time.tm_hour, tm_time.tm_min, tm_time.tm_sec);
+    assert(len == 17);
+  }
+
+  void formatMs(char (&timeMs)[32])const
+  {
+    int ms = static_cast<int>(microSeconds % MicroSecondsPerSecond);
+    int length = snprintf(timeMs, sizeof (timeMs), ".%06d  ", ms);
+    assert(length == 9); 
+  }
 
 Timestamp(const Timestamp&) = default;
 Timestamp& operator=(const Timestamp&) = default;
@@ -33,7 +56,7 @@ Timestamp& operator=(const Timestamp&) = default;
 static const int MicroSecondsPerSecond = 1000 * 1000;
 
 private:
-int64_t microSecondsSinceEpoch_;
+int64_t microSeconds;
 
 };
 

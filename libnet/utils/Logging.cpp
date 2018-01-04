@@ -4,6 +4,7 @@
 #include "Timestamp.hpp"
 #include "CurrentThread.hpp"
 
+
 namespace log
 {
 LogLevel initLogLevel()
@@ -13,11 +14,14 @@ LogLevel initLogLevel()
   else if (::getenv("LOG_DEBUG"))
     return LogLevel::DEBUG;
   else
-    return LogLevel::INFO;
+    return LogLevel::TRACE;
 }
 
 LogLevel g_logLevel =  initLogLevel();
 const std::string g_logLevelName[] = {"TRACE ","DEBUG ","INFO  ","WARN  ","ERROR ","FATAL "};
+
+__thread time_t g_lastLogSecond = {0};
+__thread char g_Logtime[32] = {0};
 }
 
 
@@ -56,7 +60,17 @@ void finish()
 
 void formatTime()
 {
-  //TODO
+  auto sms = time_.get();
+  time_t seconds = static_cast<time_t>(sms.first);
+  if (seconds != log::g_lastLogSecond)
+  {
+    log::g_lastLogSecond = seconds;
+    time_.formatSeconds(log::g_Logtime);
+  }
+  char timeMs[32];
+  time_.formatMs(timeMs);
+  
+  stream_ << static_cast<const char*>(log::g_Logtime) << static_cast<const char*>(timeMs);  
 }
   
 private:

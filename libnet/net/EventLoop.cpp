@@ -2,7 +2,7 @@
 #include "PollerBase.hpp"
 #include "Channel.hpp"
 #include "Timestamp.hpp"
-#include <iostream>
+#include "Logging.hpp"
 
 namespace
 {
@@ -30,7 +30,7 @@ void EventLoop::loop()
 {
   assertInLoopThread();//loop can only run within thread which create eventloop instance.
   
-  std::cout << "EventLoop " << this << " start looping \n";
+  LOG_TRACE << "EventLoop " << static_cast<const void*>(this) << " start looping";
 
   quit_ = false;
   while (!quit_)
@@ -46,13 +46,13 @@ void EventLoop::loop()
     doPendingFunctors();
   }
   
-  std::cout << "EventLoop " << this << " stop looping";
+  LOG_TRACE << "EventLoop " << static_cast<const void*>(this)  << " stop looping";
     
 }
 
 void EventLoop::doPendingFunctors()
 {
-  std::cout <<"  doPendingFunctors : \n";  
+  LOG_TRACE <<"  PendingFunctors num = "<<pendingFunctors_.size();  
   
   decltype(pendingFunctors_) functors;
   {
@@ -91,7 +91,7 @@ void EventLoop::removeChannel(Channel* cn)
   assert(cn->ownerLoop() == this);
   assertInLoopThread();
   poller_->removeChannel(cn);
-  std::cout << " removeChannel: fd = " << cn->fd() <<"\n";
+  LOG_TRACE << "  fd = " << cn->fd();
 }
 
 

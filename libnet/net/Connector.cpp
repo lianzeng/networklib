@@ -74,7 +74,7 @@ void Connector::connect()
 
 void Connector::connecting(int sockfd)
 {  
-   LOG_TRACE <<"sockfd = "<<sockfd;
+   LOG_TRACE <<" fd = "<<sockfd;
    setState(States::Connecting);
    assert(!channel_);
    channel_.reset(new Channel(loop_, sockfd));

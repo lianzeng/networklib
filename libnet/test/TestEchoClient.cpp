@@ -1,12 +1,12 @@
-#include <iostream>
+#include "Logging.hpp"
 #include <string>
 #include "EventLoop.hpp"
 #include "InetAddress.hpp"
 #include "TcpClient.hpp"
 #include "TcpConnection.hpp"
 #include "Buffer.hpp"
+#include <iostream>
 
-using std::cout;
 using namespace net;
 
 class EchoClient
@@ -33,7 +33,7 @@ private:
   void onMessage(const TcpConnectionPtr& conn, Buffer* buf)
   {
     std::string msg(buf->retrieveAllAsString());
-    cout<< msg ;
+    LOG_TRACE<< msg ;
     conn->send("hello!\n");
   }
 
@@ -49,7 +49,7 @@ int main(int argc, char* argv[])
 {
   if(argc <= 1)
   {
-    cout <<"Usage:  " << argv[0] <<  "  host_ip " <<"\n"; 
+    std::cout <<"Usage:  " << argv[0] <<  "  host_ip " <<"\n"; 
     return -1;
   }
 
@@ -63,7 +63,7 @@ int main(int argc, char* argv[])
   client.connect();
   loop.loop();  
 
-  cout <<"\n TestEchoClient  ok.  " <<"\n"; 
+  std::cout <<"\n TestEchoClient  ok.  " <<"\n"; 
 
   return 0;
 }
