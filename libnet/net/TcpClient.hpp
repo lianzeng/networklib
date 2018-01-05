@@ -3,7 +3,7 @@
 #define _TCP_CLIENT_HPP
 
 #include "EventLoop.hpp"
-#include "InetAddress.hpp"
+#include "../utils/InetAddress.hpp"
 #include <memory>
 
 namespace net

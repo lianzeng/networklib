@@ -1,9 +1,10 @@
 #include "Connector.hpp"
 #include "EventLoop.hpp"
 #include "Channel.hpp"
-#include "Logging.hpp"
+#include "../utils/Logging.hpp"
+#include "SocketsOps.hpp"
 #include <functional>
-#include <SocketsOps.hpp>
+
 
 
 namespace net

@@ -1,6 +1,6 @@
 #include "Channel.hpp"
 #include <poll.h>
-#include "Logging.hpp"
+#include "../utils/Logging.hpp"
 
 namespace net
 {

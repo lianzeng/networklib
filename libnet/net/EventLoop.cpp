@@ -1,8 +1,8 @@
 #include "EventLoop.hpp"
 #include "PollerBase.hpp"
 #include "Channel.hpp"
-#include "Timestamp.hpp"
-#include "Logging.hpp"
+#include "../utils/Timestamp.hpp"
+#include "../utils/Logging.hpp"
 
 namespace
 {
@@ -35,12 +35,12 @@ void EventLoop::loop()
   quit_ = false;
   while (!quit_)
   {
-    Timestamp returnTime(~0); 
-    auto  activeChannels = poller_->poll(PollTimeOutMs, returnTime);
+    Timestamp retTime(~0);
+    auto  activeChannels = poller_->poll(PollTimeOutMs, retTime);
     
     for (auto iter = activeChannels.begin(); iter != activeChannels.end();  ++iter) // improve: sort channel by priority    
     {      
-      (*iter)->handleEvent(returnTime);
+      (*iter)->handleEvent(retTime);
     }
         
     doPendingFunctors();

@@ -2,7 +2,7 @@
 #ifndef _CONNECTOR_HPP
 #define  _CONNECTOR_HPP
 
-#include "InetAddress.hpp"
+#include "../utils/InetAddress.hpp"
 #include <memory>
 
 namespace net
