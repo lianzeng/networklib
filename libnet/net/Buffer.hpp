@@ -1,5 +1,5 @@
 
-//implement buffer with std::fifo_queue
+//implement buffer with std::fifo_queue, Buffer is base class, derive ReceiveBuffer/SendBuffer;
 
 #ifndef _BUFFER_HPP
 #define _BUFFER_HPP

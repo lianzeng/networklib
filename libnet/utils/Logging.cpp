@@ -1,7 +1,7 @@
 
 #include "Logging.hpp"
 #include "LogStream.hpp"
-#include "Timestamp.hpp"
+#include "TimeStamp.hpp"
 #include "CurrentThread.hpp"
 
 
@@ -38,7 +38,7 @@ friend class Logger;
 
 private:
 LoggerImpl(LogLevel level, const char* fileName, int lineNum):
-time_(Timestamp::now()),
+time_(TimeStamp::now()),
 level_(level),
 lineNum_(lineNum),
 srcfile(fileName),
@@ -94,7 +94,7 @@ private:
   };
 
 private:
-  Timestamp time_;
+  TimeStamp time_;
   LogLevel level_;
   int lineNum_;
   FileNameExtractor srcfile;

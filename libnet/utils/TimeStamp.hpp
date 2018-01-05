@@ -9,22 +9,22 @@
 #include <cassert>
 
 /// Time stamp in UTC, in microseconds resolution.
-class Timestamp
+class TimeStamp
 {
 public:
-Timestamp(int64_t value):microSeconds(value) 
+TimeStamp(int64_t value):microSeconds(value)
 {
 }
 
-~Timestamp() = default;
+~TimeStamp() = default;
 
 
-static Timestamp now()
+static TimeStamp now()
 {
   struct timeval tv;
   gettimeofday(&tv, nullptr);
   int64_t seconds = tv.tv_sec;
-  return Timestamp(seconds * MicroSecondsPerSecond + tv.tv_usec);
+  return TimeStamp(seconds * MicroSecondsPerSecond + tv.tv_usec);
 }
 
   std::pair<int64_t, int64_t>  get() const 
@@ -50,8 +50,8 @@ static Timestamp now()
     assert(length == 9); 
   }
 
-Timestamp(const Timestamp&) = default;
-Timestamp& operator=(const Timestamp&) = default;
+TimeStamp(const TimeStamp&) = default;
+TimeStamp& operator=(const TimeStamp&) = default;
 
 static const int MicroSecondsPerSecond = 1000 * 1000;
 

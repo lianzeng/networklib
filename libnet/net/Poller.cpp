@@ -22,11 +22,11 @@ Poller::~Poller()
 }
 
 
-PollerBase::ChannelList  Poller::poll(const int timeoutMs, Timestamp& retTime)
+PollerBase::ChannelList  Poller::poll(const int timeoutMs, TimeStamp& retTime)
 {
   ChannelList activeChannels;
   int numEvents = ::poll(pollfdList_.data(), pollfdList_.size(), timeoutMs);//int ppoll(struct pollfd *fds, nfds_t nfds, const struct timespec *, const sigset_t *sigmask);
-  retTime = Timestamp::now();
+  retTime = TimeStamp::now();
   
   if(numEvents > 0)
   {

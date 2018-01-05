@@ -24,7 +24,7 @@ Channel:: ~Channel()
 
 
 
-void Channel::handleEvent(Timestamp receiveTime)
+void Channel::handleEvent(TimeStamp receiveTime)
 {//value refer to: https://github.com/torvalds/linux/blob/ead751507de86d90fa250431e9990a8b881f713c/include/uapi/asm-generic/poll.h
   LOG_TRACE << "fd = "<<fd_<<" , revents = " <<revents_;
   

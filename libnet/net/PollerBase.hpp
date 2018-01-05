@@ -5,7 +5,7 @@
 #include <map>
 #include <vector>
 #include "EventLoop.hpp"
-#include "../utils/Timestamp.hpp"
+#include "../utils/TimeStamp.hpp"
 
 
 namespace net
@@ -24,7 +24,7 @@ virtual ~PollerBase();
    static PollerBase* newDefaultPoller(EventLoop* loop);
    
 
-  virtual  ChannelList poll(const int timeoutMs, Timestamp& retTime) = 0;
+  virtual  ChannelList poll(const int timeoutMs, TimeStamp& retTime) = 0;
 
   virtual void updateChannel(Channel* channel) = 0;
 

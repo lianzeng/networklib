@@ -15,7 +15,7 @@ public:
 Poller(EventLoop*);
 virtual ~Poller();
 
-virtual ChannelList poll(const int timeoutMs, Timestamp& retTime) override ;
+virtual ChannelList poll(const int timeoutMs, TimeStamp& retTime) override ;
 virtual  void updateChannel(Channel* channel) override ;
 virtual  void removeChannel(Channel* channel) override;
 

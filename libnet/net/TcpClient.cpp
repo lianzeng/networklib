@@ -1,6 +1,7 @@
 #include "TcpClient.hpp"
 #include "Connector.hpp"
 #include "../utils/Logging.hpp"
+#include "TcpConnection.hpp"
 #include <functional>
 
 
@@ -28,6 +29,9 @@ void TcpClient::connect()
 void TcpClient::newConnection(int sockfd)
 {
     loop_->assertInLoopThread();
+    TcpConnectionPtr connectionPtr(new TcpConnection(loop_, sockfd));
+    loop_->runInLoop(std::bind(&TcpConnection::connectEstablished, connectionPtr));
+
 }
 
 

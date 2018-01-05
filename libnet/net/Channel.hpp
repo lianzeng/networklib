@@ -2,7 +2,7 @@
 #define  _CHANNEL_HPP
 
 #include "EventLoop.hpp"
-#include "../utils/Timestamp.hpp"
+#include "../utils/TimeStamp.hpp"
 #include <functional>
 
 namespace net
@@ -15,18 +15,18 @@ class Channel
 public:
 
   using EventCallback = std::function<void()> ;
-  using ReadEventCallback = std::function<void(Timestamp)> ;
+  using ReadEventCallback = std::function<void(TimeStamp)> ;
 
   Channel(EventLoop* loop, int fd);
   ~Channel();
   EventLoop* ownerLoop() {return loop_;}
-  void handleEvent(Timestamp receiveTime);
+  void handleEvent(TimeStamp receiveTime);
 
   void removeSelf(){loop_->removeChannel(this);}
   
-  void enableWriting(){events_ |= WRITE_EVENT; update();}
+  void enableWriting(){events_ |= WRITE_EVENT; update();} //write(send) data to fd
   void disableWriting(){events_ &= ~WRITE_EVENT; update();}
-  void enableReading(){events_ |= READ_EVENT; update();}
+  void enableReading(){events_ |= READ_EVENT; update();} //read(receive) data from fd
   void disableReading(){events_ &= ~READ_EVENT; update();}
   void disableEvents() { events_ = NONE_EVENT; update(); }
   bool isNoneEvent() const {return events_ == NONE_EVENT;}
