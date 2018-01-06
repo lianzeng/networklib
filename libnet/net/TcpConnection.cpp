@@ -10,7 +10,8 @@ namespace net
 TcpConnection::TcpConnection(EventLoop *loop, int sockfd):
   loop_(loop),
   channelPtr(new Channel(loop, sockfd)),
-  socketPtr(new Socket(sockfd))
+  socketPtr(new Socket(sockfd)),
+  sendBuffer(sockfd)
 {
   using namespace std::placeholders;
   channelPtr->setReadCallback(std::bind(&TcpConnection::handleRead, this, _1));
@@ -25,9 +26,35 @@ TcpConnection::~TcpConnection()
 
 void TcpConnection::send(std::string&& msg)
 {
+    loop_->runInLoop(std::bind(&TcpConnection::sendInLoop, this, std::move(msg)));
 }
 
+void TcpConnection::sendInLoop(const std::string & msg)
+{
+    loop_->assertInLoopThread();
 
+    SendBuffer::Result sendStatues = {SendBuffer::Success, 0};//<ok, wroteBytes>
+    if(sendingQueueEmpty())
+    {
+        sendStatues = sendBuffer.send( msg.data(), msg.size());
+    }
+
+    auto wroteBytes = sendStatues.second;
+    size_t remainData = msg.size() - wroteBytes;
+
+    if(remainData == 0 && sendCompleteCallback_)
+    {
+        loop_->queueInLoop(std::bind(sendCompleteCallback_, shared_from_this()));
+    }
+    else if(remainData > 0 && sendStatues.first)
+    {
+        if(sendBuffer.appendata(&msg[wroteBytes], remainData) && highWaterMarkCallback_)
+            loop_->queueInLoop(std::bind(highWaterMarkCallback_, shared_from_this(), sendBuffer.readbleBytes()));
+
+        if(!channelPtr->isWriting())
+            channelPtr->enableWriting();
+    }
+}
 
 
 void TcpConnection::connectEstablished() {
@@ -60,10 +87,21 @@ void TcpConnection::handleClose() {
     closeCallback_(shared_from_this());
 }
 
+void TcpConnection::connectionDestroyed()
+{
+    loop_->assertInLoopThread();
+    channelPtr->removeSelf();
+}
+
 void TcpConnection::handleError() {
     loop_->assertInLoopThread();
     int err = sockets::getSocketError(channelPtr->fd());
     LOG_ERROR << "TcpConnection::handleError " << " - SO_ERROR = " << err << " " << log::strerror_tl(err);
+}
+
+
+bool TcpConnection::sendingQueueEmpty() const {
+        return !channelPtr->isWriting() && sendBuffer.readbleBytes() == 0;
 }
 
 

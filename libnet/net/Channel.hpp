@@ -30,6 +30,7 @@ public:
   void disableReading(){events_ &= ~READ_EVENT; update();}
   void disableEvents() { events_ = NONE_EVENT; update(); }
   bool isNoneEvent() const {return events_ == NONE_EVENT;}
+  bool isWriting() const {return (events_ & WRITE_EVENT) != 0;}
 
   void setReadCallback(ReadEventCallback&& cb){ readCallback_ = std::move(cb); }
   void setWriteCallback(EventCallback&& cb) {writeCallback_ = std::move(cb);}

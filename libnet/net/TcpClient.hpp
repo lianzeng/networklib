@@ -31,6 +31,7 @@ void setSendCompleteCallback(SendCompleteCallback&& cb){sendCompleteCallback_ = 
 
 private:
 void newConnection(int sockfd);// callback
+void removeConnection(const TcpConnectionPtr&);
 
 TcpClient(const TcpClient&) = delete;
 TcpClient& operator=(const TcpClient&) = delete;

@@ -28,18 +28,33 @@ void TcpClient::connect()
 
 void TcpClient::newConnection(int sockfd)
 {
+    using namespace std::placeholders;
     loop_->assertInLoopThread();
     TcpConnectionPtr connectionPtr(new TcpConnection(loop_, sockfd));
     connectionPtr->setMessageCallback(messageCallback_);
     connectionPtr->setSendCompleteCallback(sendCompleteCallback_);
     connectionPtr->setConnectionCallback(connectionCallback_);
-
+    connectionPtr->setCloseCallback(std::bind(&TcpClient::removeConnection, this, _1));
     {
         std::lock_guard<std::mutex> lock(mutex_);
         connectionPtr_ = connectionPtr;
     }
 
     loop_->runInLoop(std::bind(&TcpConnection::connectEstablished, connectionPtr));
+
+}
+
+void TcpClient::removeConnection(const TcpConnectionPtr & conn)
+{
+    assert(loop_ == conn->ownerLoop());
+
+    {
+        std::lock_guard<std::mutex> lock(mutex_);
+        assert(connectionPtr_ == conn);
+        connectionPtr_.reset();
+    }
+
+    loop_->queueInLoop(std::bind(&TcpConnection::connectionDestroyed, conn));
 
 }
 

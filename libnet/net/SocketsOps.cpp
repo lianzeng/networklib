@@ -76,8 +76,13 @@ bool isSelfConnect(int sockfd)
 {
   struct sockaddr_in localaddr = getLocalAddr(sockfd);
   struct sockaddr_in peeraddr = getPeerAddr(sockfd);
-  return localaddr.sin_port == peeraddr.sin_port && 
-              localaddr.sin_addr.s_addr == peeraddr.sin_addr.s_addr;
+  return localaddr.sin_port == peeraddr.sin_port &&
+         localaddr.sin_addr.s_addr == peeraddr.sin_addr.s_addr;
+}
+
+ssize_t write(int sockfd, const void *buf, size_t count)
+{
+  return ::write(sockfd, buf, count);
 }
 
 

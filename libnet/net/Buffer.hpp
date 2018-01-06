@@ -13,7 +13,7 @@ class Buffer
 public:
 
 Buffer();
-~Buffer();
+virtual  ~Buffer();
 
 Buffer(const Buffer&) = default;
 Buffer& operator=(const Buffer&) = default;
@@ -21,11 +21,14 @@ Buffer& operator=(const Buffer&) = default;
 std::string retrieveAllAsString();
 
 size_t readbleBytes() const;
+void append(const char* data, size_t len);
 
 private:
 //std::queue<char> data;
 
 };
+
+
 
 
 }

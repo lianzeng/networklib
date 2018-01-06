@@ -23,6 +23,11 @@ size_t Buffer::readbleBytes() const
     return 0;
 }
 
+void Buffer::append(const char *data, size_t len)
+{
+
+}
+
 
 }
 

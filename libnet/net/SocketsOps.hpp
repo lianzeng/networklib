@@ -15,6 +15,10 @@ int getSocketError(int sockfd);
 bool isSelfConnect(int sockfd);
 struct sockaddr_in getPeerAddr(int sockfd);
 struct sockaddr_in getLocalAddr(int sockfd);
+
+ssize_t write(int sockfd, const void *buf, size_t count);
+
+
 }
 }
 
