@@ -7,6 +7,8 @@
 #include "EventLoop.hpp"
 #include "../utils/TimeStamp.hpp"
 #include "Socket.hpp"
+#include "Callback.hpp"
+#include "Buffer.hpp"
 
 
 namespace net
@@ -15,7 +17,7 @@ namespace net
 class Channel;
 
 //TCP connection: for both client and server usage, expose to user;
-class TcpConnection
+class TcpConnection : public std::enable_shared_from_this<TcpConnection>
 {
 public:
 using ChannelPtr = std::unique_ptr<Channel>;
@@ -34,6 +36,11 @@ void handleError();
 
 void connectEstablished();//called when 1)tcp server accept new connection or 2)tcp client connect sucessfully.
 
+    void setConnectionCallback(const ConnectionCallback& cb){ connectionCallback_ = cb;}
+    void setMessageCallback(const MessageCallback& cb){ messageCallback_  = cb;}
+    void setSendCompleteCallback(const SendCompleteCallback& cb){sendCompleteCallback_ = cb;}
+    void setCloseCallback(const CloseCallback& cb){ closeCallback_ = cb;}
+
 private:
 TcpConnection(const TcpConnection&) = delete;
 TcpConnection& operator=(const TcpConnection&) = delete;
@@ -42,8 +49,14 @@ TcpConnection& operator=(const TcpConnection&) = delete;
 EventLoop* loop_;
 ChannelPtr channelPtr;
 std::unique_ptr<Socket> socketPtr;
-    //sendBuffer
-    //receivedBuffer
+
+ConnectionCallback   connectionCallback_;
+MessageCallback      messageCallback_;
+SendCompleteCallback sendCompleteCallback_;
+CloseCallback        closeCallback_;
+
+Buffer    sendBuffer;
+Buffer    receivedBuffer;
 };
 
 

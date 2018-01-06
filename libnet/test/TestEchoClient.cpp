@@ -16,21 +16,27 @@ public:
     loop_(loop),
     client_(loop, serverAddr)
   {
+    using namespace std::placeholders;
+    client_.setConnectionCallback(std::bind(&EchoClient::onConnection, this, _1));
+    client_.setMessageCallback(std::bind(&EchoClient::onMessage, this, _1, _2, _3));
   }
 
   void connect()
   {
     client_.connect();
   }
+
+
   
 private:
 
   void onConnection(const TcpConnectionPtr& conn)
   {
+    LOG_TRACE << "EchoClient connected ! ";
     conn->send("connected!\n");
   }
 
-  void onMessage(const TcpConnectionPtr& conn, Buffer* buf)
+  void onMessage(const TcpConnectionPtr& conn, Buffer* buf, TimeStamp)
   {
     std::string msg(buf->retrieveAllAsString());
     LOG_TRACE<< msg ;

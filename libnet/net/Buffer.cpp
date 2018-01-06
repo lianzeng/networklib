@@ -18,6 +18,11 @@ std::string Buffer::retrieveAllAsString()
   return "buffer\n";
 }
 
+size_t Buffer::readbleBytes() const
+{
+    return 0;
+}
+
 
 }
 

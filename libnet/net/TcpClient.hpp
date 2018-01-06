@@ -4,7 +4,9 @@
 
 #include "EventLoop.hpp"
 #include "../utils/InetAddress.hpp"
+#include "Callback.hpp"
 #include <memory>
+#include <mutex>
 
 namespace net
 {
@@ -15,9 +17,16 @@ using ConnectorPtr = std::shared_ptr<Connector>;
 class TcpClient
 {
 public:
+
+
 TcpClient(EventLoop* loop, const InetAddress& serverAddr);
- ~TcpClient(); 
+ ~TcpClient();
+
 void connect();
+
+void setConnectionCallback(ConnectionCallback&& cb){ connectionCallback_ = std::move(cb);}
+void setMessageCallback(MessageCallback&& cb){ messageCallback_  = std::move(cb);}
+void setSendCompleteCallback(SendCompleteCallback&& cb){sendCompleteCallback_ = std::move(cb);}
 
 
 private:
@@ -29,6 +38,14 @@ TcpClient& operator=(const TcpClient&) = delete;
 
 EventLoop* loop_;
 ConnectorPtr connector_;
+
+std::mutex mutex_;
+TcpConnectionPtr connectionPtr_;
+
+ConnectionCallback connectionCallback_;
+MessageCallback messageCallback_;
+SendCompleteCallback sendCompleteCallback_;
+
 };
 
 }

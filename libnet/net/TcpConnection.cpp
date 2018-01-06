@@ -1,6 +1,8 @@
 
 #include "TcpConnection.hpp"
 #include "Channel.hpp"
+#include "SocketsOps.hpp"
+#include "../utils/Logging.hpp"
 
 namespace net
 {
@@ -25,31 +27,44 @@ void TcpConnection::send(std::string&& msg)
 {
 }
 
+
+
+
+void TcpConnection::connectEstablished() {
+    loop_->assertInLoopThread();
+    channelPtr->enableReading();
+    connectionCallback_(shared_from_this());
+
+}
+
+void TcpConnection::handleRead(TimeStamp receiveTime) {
+    loop_->assertInLoopThread();
+    //receivedBuffer.readFd(channelPtr->fd())
+    messageCallback_(shared_from_this(), &receivedBuffer, receiveTime);
+}
+
 void TcpConnection::handleWrite() {
-   loop_->assertInLoopThread();
-   //sendBuffer.writeFd(channelPtr->fd());
+    loop_->assertInLoopThread();
+    //sendBuffer.writeFd(channelPtr->fd());
+    if(sendBuffer.readbleBytes() == 0)
+    {
+        channelPtr->disableWriting();
+        if(sendCompleteCallback_)
+            loop_->queueInLoop(std::bind(sendCompleteCallback_, shared_from_this()));
+    }
 }
 
 void TcpConnection::handleClose() {
-  loop_->assertInLoopThread();
+    loop_->assertInLoopThread();
+    channelPtr->disableEvents();
+    closeCallback_(shared_from_this());
 }
 
 void TcpConnection::handleError() {
     loop_->assertInLoopThread();
-
+    int err = sockets::getSocketError(channelPtr->fd());
+    LOG_ERROR << "TcpConnection::handleError " << " - SO_ERROR = " << err << " " << log::strerror_tl(err);
 }
-
-void TcpConnection::handleRead(TimeStamp) {
-    loop_->assertInLoopThread();
-    //receivedBuffer.readFd(channelPtr->fd())
-
-}
-
-    void TcpConnection::connectEstablished() {
-        loop_->assertInLoopThread();
-        channelPtr->enableReading();
-
-    }
 
 
 }

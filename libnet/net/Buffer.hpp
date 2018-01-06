@@ -20,8 +20,11 @@ Buffer& operator=(const Buffer&) = default;
 
 std::string retrieveAllAsString();
 
+size_t readbleBytes() const;
+
 private:
 //std::queue<char> data;
+
 };
 
 
