@@ -38,7 +38,7 @@ private:
 
   void onMessage(const TcpConnectionPtr& conn, Buffer* buf, TimeStamp)
   {
-    std::string msg(buf->retrieveAllAsString());
+    std::string msg(buf->retrieveAll());
     LOG_TRACE<< msg ;
     conn->send("hello!\n");
   }

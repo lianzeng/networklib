@@ -85,6 +85,17 @@ ssize_t write(int sockfd, const void *buf, size_t count)
   return ::write(sockfd, buf, count);
 }
 
+ssize_t read(int fd, char *buf, size_t buffSize)
+{
+  return ::read(fd, buf, buffSize);
+}
+
+void shutdownWrite(int sockfd)
+{
+    if(::shutdown(sockfd, SHUT_WR) < 0)
+        LOG_ERROR <<"sockets::shutdownWrite";
+}
+
 
 }
 }

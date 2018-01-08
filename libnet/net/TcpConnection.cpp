@@ -11,7 +11,10 @@ TcpConnection::TcpConnection(EventLoop *loop, int sockfd):
   loop_(loop),
   channelPtr(new Channel(loop, sockfd)),
   socketPtr(new Socket(sockfd)),
-  sendBuffer(sockfd)
+  sendBuffer(sockfd),
+  receivedBuffer(sockfd),
+  states_(Connecting)
+
 {
   using namespace std::placeholders;
   channelPtr->setReadCallback(std::bind(&TcpConnection::handleRead, this, _1));
@@ -48,7 +51,8 @@ void TcpConnection::sendInLoop(const std::string & msg)
     }
     else if(remainData > 0 && sendStatues.first)
     {
-        if(sendBuffer.appendata(&msg[wroteBytes], remainData) && highWaterMarkCallback_)
+        auto trigHighWaterMark = sendBuffer.appendata(&msg[wroteBytes], remainData);
+        if(trigHighWaterMark && highWaterMarkCallback_)
             loop_->queueInLoop(std::bind(highWaterMarkCallback_, shared_from_this(), sendBuffer.readbleBytes()));
 
         if(!channelPtr->isWriting())
@@ -59,6 +63,7 @@ void TcpConnection::sendInLoop(const std::string & msg)
 
 void TcpConnection::connectEstablished() {
     loop_->assertInLoopThread();
+    setState(Connected);
     channelPtr->enableReading();
     connectionCallback_(shared_from_this());
 
@@ -66,23 +71,31 @@ void TcpConnection::connectEstablished() {
 
 void TcpConnection::handleRead(TimeStamp receiveTime) {
     loop_->assertInLoopThread();
-    //receivedBuffer.readFd(channelPtr->fd())
-    messageCallback_(shared_from_this(), &receivedBuffer, receiveTime);
+    auto readBytes = receivedBuffer.receive();
+    if(readBytes > 0)
+        messageCallback_(shared_from_this(), &receivedBuffer, receiveTime);
+    else if(readBytes == 0) //peer close
+        handleClose();
+    else
+        handleError();
 }
 
 void TcpConnection::handleWrite() {
     loop_->assertInLoopThread();
-    //sendBuffer.writeFd(channelPtr->fd());
-    if(sendBuffer.readbleBytes() == 0)
+    auto result = sendBuffer.send();
+    if(result.first && sendBuffer.readbleBytes() == 0)
     {
         channelPtr->disableWriting();
         if(sendCompleteCallback_)
             loop_->queueInLoop(std::bind(sendCompleteCallback_, shared_from_this()));
+        if(states_ == Disconnecting)
+            shutDownInLoop();
     }
 }
 
 void TcpConnection::handleClose() {
     loop_->assertInLoopThread();
+    setState(Disconnected);
     channelPtr->disableEvents();
     closeCallback_(shared_from_this());
 }
@@ -102,6 +115,12 @@ void TcpConnection::handleError() {
 
 bool TcpConnection::sendingQueueEmpty() const {
         return !channelPtr->isWriting() && sendBuffer.readbleBytes() == 0;
+}
+
+void TcpConnection::shutDownInLoop() {
+    if(!channelPtr->isWriting())
+        socketPtr->shutdownWrite();
+
 }
 
 

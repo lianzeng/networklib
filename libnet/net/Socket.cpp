@@ -16,4 +16,8 @@ namespace  net {
         sockets::close(sockfd_);
     }
 
+    void Socket::shutdownWrite() {
+        sockets::shutdownWrite(sockfd_);
+    }
+
 }

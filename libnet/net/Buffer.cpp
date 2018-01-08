@@ -1,4 +1,5 @@
 
+#include <cassert>
 #include "Buffer.hpp"
 
 namespace net
@@ -13,19 +14,27 @@ Buffer::~Buffer()
 }
 
 
-std::string Buffer::retrieveAllAsString()
+std::string Buffer::retrieveAll()
 {
-  return "buffer\n";
+    decltype(buffer_) tmp;
+    tmp.swap(buffer_);
+    return tmp;
 }
 
 size_t Buffer::readbleBytes() const
 {
-    return 0;
+    return buffer_.size();
 }
 
 void Buffer::append(const char *data, size_t len)
 {
+  buffer_.append(data, len);
+}
 
+void Buffer::retrieve(size_t len)
+{
+  assert(len <= buffer_.size());
+  buffer_.erase(0, len);
 }
 
 

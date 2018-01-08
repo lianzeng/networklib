@@ -1,10 +1,11 @@
 
-//implement buffer with std::fifo_queue, Buffer is base class, derive ReceiveBuffer/SendBuffer;
+//implement buffer with std::string, Buffer is base class, derive ReceiveBuffer/SendBuffer;
 
 #ifndef _BUFFER_HPP
 #define _BUFFER_HPP
 
 #include <string>
+
 
 namespace net
 {
@@ -18,13 +19,17 @@ virtual  ~Buffer();
 Buffer(const Buffer&) = default;
 Buffer& operator=(const Buffer&) = default;
 
-std::string retrieveAllAsString();
+std::string retrieveAll();
+void retrieve(size_t len);
 
-size_t readbleBytes() const;
 void append(const char* data, size_t len);
 
-private:
-//std::queue<char> data;
+size_t readbleBytes() const;
+
+protected:
+std::string buffer_;
+
+
 
 };
 

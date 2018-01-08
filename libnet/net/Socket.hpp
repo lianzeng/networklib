@@ -15,6 +15,7 @@ namespace  net {
         explicit Socket(int fd);
 
         ~Socket();
+        void shutdownWrite();
 
     private:
         Socket(const Socket &) = delete;

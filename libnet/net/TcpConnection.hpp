@@ -25,6 +25,7 @@ public:
 using ChannelPtr = std::unique_ptr<Channel>;
 
 
+public:
 TcpConnection(EventLoop* loop, int sockfd);
 ~TcpConnection();
 
@@ -47,10 +48,13 @@ void setCloseCallback(const CloseCallback& cb){ closeCallback_ = cb;}
 EventLoop* ownerLoop(){return loop_;}
 
 private:
+enum States{Disconnected, Connecting, Connected, Disconnecting};
+
 void sendInLoop(const std::string& msg);
-
 bool sendingQueueEmpty() const;
+void shutDownInLoop();
 
+void setState(States s){ states_ = s;}
 
 private:
 TcpConnection(const TcpConnection&) = delete;
@@ -69,6 +73,8 @@ HighWaterMarkCallback highWaterMarkCallback_;
 
 SendBuffer       sendBuffer;
 ReceiveBuffer    receivedBuffer;
+
+States     states_;
 };
 
 

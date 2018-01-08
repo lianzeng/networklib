@@ -31,6 +31,7 @@ public:
     SendBuffer&operator=(const SendBuffer&) = default;
 
     Result send(const char *data, size_t len);
+    Result send();
     bool appendata(const char *data, size_t len) ;
 
 private:
