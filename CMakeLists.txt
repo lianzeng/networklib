@@ -31,8 +31,16 @@ set(SOURCE_FILES
         libnet/utils/LogStream.hpp
         libnet/utils/TimeStamp.hpp
         libnet/libnet.mk
+        libnet/net/Socket.cpp
+        libnet/net/Socket.hpp
+        libnet/net/Callback.hpp
+        libnet/net/SendBuffer.cpp 
+        libnet/net/SendBuffer.hpp
+        libnet/net/ReceiveBuffer.cpp
+        libnet/net/ReceiveBuffer.hpp
         makefile
         README.md
-        readme.txt libnet/net/Socket.cpp libnet/net/Socket.hpp libnet/net/Callback.hpp libnet/net/SendBuffer.cpp libnet/net/SendBuffer.hpp libnet/net/ReceiveBuffer.cpp libnet/net/ReceiveBuffer.hpp)
+        readme.txt
+        )
 
 add_executable(multiThread ${SOURCE_FILES})
