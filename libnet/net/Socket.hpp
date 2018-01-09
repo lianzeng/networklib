@@ -7,24 +7,33 @@
 #ifndef MULTITHREAD_SOCKET_HPP
 #define MULTITHREAD_SOCKET_HPP
 
+#include "../utils/InetAddress.hpp"
+
 namespace  net {
 
-    class Socket {
+class Socket
+{
 
-    public:
-        explicit Socket(int fd);
+public:
+using AcceptResult = std::pair<int, InetAddress>;//<fd, InetAddress>
 
-        ~Socket();
-        void shutdownWrite();
+    explicit Socket(int fd);
+    ~Socket();
 
-    private:
-        Socket(const Socket &) = delete;
+    void bindAddress(const InetAddress& localAddr);
+    void listen();
+    AcceptResult accept();
 
-        Socket &operator=(const Socket &) = delete;
+    int fd() const {return sockfd_;}
+    void shutdownWrite();
 
-        int sockfd_;
+private:
+    Socket(const Socket &) = delete;
+    Socket &operator=(const Socket &) = delete;
 
-    };
+    int sockfd_;
+
+};
 
 }
 

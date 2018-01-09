@@ -8,7 +8,7 @@
 
 namespace  net {
 
-    Socket::Socket(int fd) : sockfd_(fd) {
+    Socket::Socket(int sockfd) : sockfd_(sockfd) {
 
     }
 
@@ -19,5 +19,22 @@ namespace  net {
     void Socket::shutdownWrite() {
         sockets::shutdownWrite(sockfd_);
     }
+
+    void bind(int sockfd, const struct sockaddr *addr);
+
+    void Socket::bindAddress(const InetAddress &localAddr) {
+        sockets::bind(sockfd_, localAddr.getSockAddr());
+    }
+
+    void Socket::listen() {
+        sockets::listen(sockfd_);
+    }
+
+    Socket::AcceptResult Socket::accept() {
+        struct sockaddr_in addr;
+        auto connectfd = sockets::accept(sockfd_, (struct sockaddr*)&addr);
+        return {connectfd, InetAddress(addr)};
+    }
+
 
 }

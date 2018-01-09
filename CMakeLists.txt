@@ -41,6 +41,7 @@ set(SOURCE_FILES
         makefile
         README.md
         readme.txt
-        )
+        libnet/net/Acceptor.cpp
+        libnet/net/Acceptor.hpp)
 
 add_executable(multiThread ${SOURCE_FILES})

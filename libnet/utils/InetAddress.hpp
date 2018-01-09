@@ -7,8 +7,8 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 //#include <sys/socket.h>
-#include <cassert>
 #include <type_traits>
+#include "Logging.hpp"
 
 class InetAddress
 {
@@ -18,6 +18,17 @@ public:
     memset(&addr, 0, sizeof(addr));
     convertIpAddr(ip, port);
   }
+
+  InetAddress(): InetAddress("0.0.0.0", 0)
+  {
+
+  }
+
+  explicit InetAddress(const struct sockaddr_in& addre): addr(addre)
+  {
+  }
+
+
 
   sa_family_t family() const { return addr.sin_family; }
   const struct sockaddr* getSockAddr() const 
@@ -39,7 +50,7 @@ private:
     addr.sin_port = htons(port);
     if (::inet_pton(AF_INET, ip.c_str(), &addr.sin_addr) <= 0)
     {
-      assert(0);
+      LOG_FATAL <<"ip : "<< ip << "port : "<< port;
     }
   }
 
@@ -48,6 +59,8 @@ private:
 
   
 };
+
+
 
 
 #endif

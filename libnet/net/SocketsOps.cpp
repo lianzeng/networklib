@@ -27,6 +27,55 @@ int connect(int sockfd, const struct sockaddr* addr)
   return ::connect(sockfd, addr, static_cast<socklen_t>(sizeof(struct sockaddr)));
 }
 
+void bind(int sockfd, const struct sockaddr *addr)
+{
+  if(::bind(sockfd, addr, sizeof(struct sockaddr)) < 0)
+    LOG_FATAL <<"bind error";
+}
+
+void listen(int sockfd)
+{
+  if(::listen(sockfd, SOMAXCONN) < 0)
+    LOG_FATAL <<"listen error";
+}
+
+int accept(int sockfd, struct sockaddr *addr)
+{
+  socklen_t addrlen = sizeof(struct sockaddr);
+  int connectfd = ::accept4(sockfd, addr, &addrlen, SOCK_NONBLOCK | SOCK_CLOEXEC);
+  if(connectfd < 0)
+  {
+      int savedErr = errno;
+      LOG_ERROR << "accept " << savedErr << " " << log::strerror_tl(savedErr);
+      switch (savedErr)
+      {
+          case EAGAIN:
+          case ECONNABORTED:
+          case EINTR:
+          case EPROTO:
+          case EPERM:
+          case EMFILE:
+              LOG_INFO <<" error of ::accept " << savedErr;
+              errno = savedErr;
+              break;
+          case EBADF:
+          case EINVAL:
+          case EFAULT:
+          case ENFILE:
+          case ENOBUFS:
+          case ENOMEM:
+          case ENOTSOCK:
+          case EOPNOTSUPP:
+              LOG_FATAL<<"unexpected error of ::accept " << savedErr;
+              break;
+          default:
+              LOG_FATAL<<"unknown error of ::accept " << savedErr;
+              break;
+      }
+  }
+  return connectfd;
+}
+
 void close(int sockfd)
 {
   if (::close(sockfd) < 0) assert(0);
@@ -95,6 +144,13 @@ void shutdownWrite(int sockfd)
     if(::shutdown(sockfd, SHUT_WR) < 0)
         LOG_ERROR <<"sockets::shutdownWrite";
 }
+
+ssize_t readv(int fd, const struct iovec * iov, int iovecNum)
+{
+  return ::readv(fd,iov, iovecNum);
+}
+
+
 
 
 }
