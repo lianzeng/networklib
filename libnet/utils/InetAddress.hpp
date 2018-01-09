@@ -19,9 +19,12 @@ public:
     convertIpAddr(ip, port);
   }
 
-  InetAddress(): InetAddress("0.0.0.0", 0)
+  InetAddress(bool loopbackOnly = false, uint16_t port = 0)
   {
-
+    in_addr_t ipaddr = loopbackOnly ? INADDR_LOOPBACK : INADDR_ANY;
+    addr.sin_family = AF_INET;
+    addr.sin_port   = htons(port);
+    addr.sin_addr.s_addr = htonl(ipaddr);
   }
 
   explicit InetAddress(const struct sockaddr_in& addre): addr(addre)

@@ -22,7 +22,6 @@ set(SOURCE_FILES
         libnet/net/TcpClient.hpp
         libnet/net/TcpConnection.cpp
         libnet/net/TcpConnection.hpp
-        libnet/test/TestEchoClient.cpp
         libnet/utils/CurrentThread.cpp
         libnet/utils/CurrentThread.hpp
         libnet/utils/InetAddress.hpp
@@ -30,7 +29,6 @@ set(SOURCE_FILES
         libnet/utils/Logging.hpp
         libnet/utils/LogStream.hpp
         libnet/utils/TimeStamp.hpp
-        libnet/libnet.mk
         libnet/net/Socket.cpp
         libnet/net/Socket.hpp
         libnet/net/Callback.hpp
@@ -38,6 +36,11 @@ set(SOURCE_FILES
         libnet/net/SendBuffer.hpp
         libnet/net/ReceiveBuffer.cpp
         libnet/net/ReceiveBuffer.hpp
+        libnet/libnet.mk
+
+
+        libnet/test/TestEchoServer.cpp
+
         makefile
         README.md
         readme.txt
