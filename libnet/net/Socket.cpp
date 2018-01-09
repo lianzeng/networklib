@@ -36,5 +36,17 @@ namespace  net {
         return {connectfd, InetAddress(addr)};
     }
 
+    void Socket::enableReuseAddr() {
+        int optval = 1;
+        ::setsockopt(sockfd_, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(optval));
+
+    }
+
+    void Socket::setReusePort(bool reusePort) {
+        int optval = reusePort ? 1 : 0;
+        ::setsockopt(sockfd_, SOL_SOCKET, SO_REUSEPORT, &optval, sizeof(optval));
+
+    }
+
 
 }

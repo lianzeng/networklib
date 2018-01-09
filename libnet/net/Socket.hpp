@@ -27,6 +27,9 @@ using AcceptResult = std::pair<int, InetAddress>;//<fd, InetAddress>
     int fd() const {return sockfd_;}
     void shutdownWrite();
 
+    void enableReuseAddr();
+    void setReusePort(bool reusePort);
+
 private:
     Socket(const Socket &) = delete;
     Socket &operator=(const Socket &) = delete;

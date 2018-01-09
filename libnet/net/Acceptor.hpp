@@ -21,7 +21,7 @@ class Acceptor
 public:
     using NewConnectionCallback = std::function<void (int sockfd, const InetAddress&)>;
 
-    Acceptor(EventLoop* loop, const InetAddress& listenAddr);
+    Acceptor(EventLoop* loop, const InetAddress& listenAddr, bool reusePort);
     ~Acceptor();
 
     void setNewConnectionCallback(const NewConnectionCallback & );
@@ -39,6 +39,8 @@ EventLoop* loop_;
 Socket  acceptSocket_;
 Channel acceptChannel;
 NewConnectionCallback newConnectionCallback_;
+
+int idleFd_;
 
 };
 
