@@ -62,6 +62,7 @@ void TcpConnection::sendInLoop(const std::string & msg)
 
 
 void TcpConnection::connectEstablished() {
+    LOG_TRACE <<"TcpConnection::connectEstablished: fd = " << channelPtr->fd();
     loop_->assertInLoopThread();
     setState(Connected);
     channelPtr->enableReading();
@@ -70,6 +71,7 @@ void TcpConnection::connectEstablished() {
 }
 
 void TcpConnection::handleRead(TimeStamp receiveTime) {
+    LOG_TRACE <<"TcpConnection::handleRead: fd = " << channelPtr->fd();
     loop_->assertInLoopThread();
     auto readBytes = receivedBuffer.receive();
     if(readBytes > 0)
@@ -81,6 +83,8 @@ void TcpConnection::handleRead(TimeStamp receiveTime) {
 }
 
 void TcpConnection::handleWrite() {
+
+    LOG_TRACE <<"TcpConnection::handleWrite: fd = " << channelPtr->fd();
     loop_->assertInLoopThread();
     auto result = sendBuffer.send();
     if(result.first && sendBuffer.readbleBytes() == 0)
@@ -94,6 +98,8 @@ void TcpConnection::handleWrite() {
 }
 
 void TcpConnection::handleClose() {
+
+    LOG_TRACE <<"TcpConnection::handleClose: fd = " << channelPtr->fd();
     loop_->assertInLoopThread();
     setState(Disconnected);
     channelPtr->disableEvents();
@@ -102,6 +108,7 @@ void TcpConnection::handleClose() {
 
 void TcpConnection::connectionDestroyed()
 {
+    LOG_TRACE <<"TcpConnection::connectionDestroyed: fd = " << channelPtr->fd();
     loop_->assertInLoopThread();
     channelPtr->removeSelf();
 }
@@ -109,7 +116,7 @@ void TcpConnection::connectionDestroyed()
 void TcpConnection::handleError() {
     loop_->assertInLoopThread();
     int err = sockets::getSocketError(channelPtr->fd());
-    LOG_ERROR << "TcpConnection::handleError " << " - SO_ERROR = " << err << " " << log::strerror_tl(err);
+    LOG_ERROR << "TcpConnection::handleError " << " - SO_ERROR = " << err << " " << logg::strerror_tl(err);
 }
 
 
@@ -118,6 +125,7 @@ bool TcpConnection::sendingQueueEmpty() const {
 }
 
 void TcpConnection::shutDownInLoop() {
+    LOG_TRACE <<"TcpConnection::shutDownInLoop: fd = " << channelPtr->fd();
     if(!channelPtr->isWriting())
         socketPtr->shutdownWrite();
 

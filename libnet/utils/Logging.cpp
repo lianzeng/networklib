@@ -5,7 +5,7 @@
 #include "CurrentThread.hpp"
 
 
-namespace log
+namespace logg
 {
 LogLevel initLogLevel()
 {
@@ -47,7 +47,7 @@ stream_()
   formatTime();
   currentThread::tid();
   stream_ << std::string(currentThread::tidString(), static_cast<size_t>(currentThread::tidStringLength()));
-  stream_<<log::g_logLevelName[static_cast<int>(level)];
+  stream_<<logg::g_logLevelName[static_cast<int>(level)];
 }
 
 ~LoggerImpl() = default;
@@ -68,15 +68,15 @@ void formatTime()
 {
   auto sms = time_.get();
   time_t seconds = static_cast<time_t>(sms.first);
-  if (seconds != log::g_lastLogSecond)
+  if (seconds != logg::g_lastLogSecond)
   {
-    log::g_lastLogSecond = seconds;
-    time_.formatSeconds(log::g_Logtime);
+    logg::g_lastLogSecond = seconds;
+    time_.formatSeconds(logg::g_Logtime);
   }
   char timeMs[32];
   time_.formatMs(timeMs);
   
-  stream_ << static_cast<const char*>(log::g_Logtime) << static_cast<const char*>(timeMs);  
+  stream_ << static_cast<const char*>(logg::g_Logtime) << static_cast<const char*>(timeMs);
 }
   
 private:

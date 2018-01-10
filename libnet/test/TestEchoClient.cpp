@@ -33,14 +33,14 @@ private:
   void onConnection(const TcpConnectionPtr& conn)
   {
     LOG_TRACE << "EchoClient connected ! ";
-    conn->send("connected!\n");
+    conn->send("hello!\n");
   }
 
   void onMessage(const TcpConnectionPtr& conn, Buffer* buf, TimeStamp)
   {
     std::string msg(buf->retrieveAll());
     LOG_TRACE<< msg ;
-    conn->send("hello!\n");
+    conn->send("world!\n");
   }
 
   EchoClient(const EchoClient&) = delete;

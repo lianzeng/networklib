@@ -96,7 +96,7 @@ void Connector::handleWrite()
     int err = sockets::getSocketError(fd);
     if (err)
     {
-      LOG_WRN << " SO_ERROR = " << err << " " << log::strerror_tl(err);
+      LOG_WRN << " SO_ERROR = " << err << " " << logg::strerror_tl(err);
       retry(fd);
     }
     else if (sockets::isSelfConnect(fd))
@@ -119,7 +119,7 @@ void Connector::handleError()
   {
     removeAndFreeChannel();
     int err = sockets::getSocketError(channel_->fd());
-    LOG_ERROR<< "SO_ERROR = " << err << " " << log::strerror_tl(err);
+    LOG_ERROR<< "SO_ERROR = " << err << " " << logg::strerror_tl(err);
     retry(channel_->fd());
   }
 }
@@ -142,7 +142,7 @@ void Connector::retry(int sockfd)
 void Connector::freeChannel()
 {
   LOG_DBG <<"  fd =  "  <<channel_->fd();
-  channel_.reset();//unique_ptr.reset(), free resource.
+  channel_.reset();//free connect_channel, but not free connect_fd,which will be reused for data_channel.
 }
 
 }

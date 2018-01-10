@@ -66,8 +66,10 @@ void EventLoop::doPendingFunctors()
 
 void EventLoop::runInLoop(Functor&& cb)
 {
-  if(isInLoopThread()) cb();
-  else queueInLoop(std::move(cb));
+  if(isInLoopThread())
+    cb();
+  else
+    queueInLoop(std::move(cb));
 }
 
 void EventLoop::queueInLoop(Functor&& cb)

@@ -47,6 +47,8 @@ set(SOURCE_FILES
         libnet/net/Acceptor.cpp
         libnet/net/Acceptor.hpp
         libnet/net/TcpServer.cpp
-        libnet/net/TcpServer.hpp)
+        libnet/net/TcpServer.hpp
+        libnet/net/EventLoopThreadPool.cpp
+        libnet/net/EventLoopThreadPool.hpp)
 
 add_executable(multiThread ${SOURCE_FILES})

@@ -68,6 +68,7 @@ std::string Channel::eventToString(int event)
     if(event & POLLRDHUP) {oss <<"POLLRDHUP ";unknowEvent = false;}
     if(event & POLLERR)   {oss <<"POLLERR "; unknowEvent = false;}
     if(event & POLLNVAL)  {oss <<"POLLNVAL ";unknowEvent = false;}
+    if(event == NONE_EVENT){oss <<"None_Event ";unknowEvent = false;}
 
     if(unknowEvent)
         return "unknow event";

@@ -19,12 +19,12 @@ class EchoServer
 public:
     EchoServer(EventLoop* loop, const InetAddress& listenAddr): tcpServer(loop, listenAddr)
     {
-
+        using namespace std::placeholders;
+        tcpServer.setConnectionCallback(std::bind(&EchoServer::onConnection, this, _1));
+        tcpServer.setMessageCallback(std::bind(&EchoServer::onMessage, this, _1, _2, _3));
     }
-    ~EchoServer()
-    {
+    ~EchoServer() = default;
 
-    }
 
     void start()
     {
@@ -32,6 +32,18 @@ public:
     }
 
 private:
+    void onConnection(const TcpConnectionPtr& conn)
+    {
+        LOG_TRACE<<"EchoServer connected ! ";
+        conn->send("Nice !");
+    }
+
+    void onMessage(const TcpConnectionPtr& conn, Buffer* buffer, TimeStamp)
+    {
+        LOG_TRACE <<"EchoServer receive message: "<< buffer->retrieveAll();
+        conn->send("Bye !");
+    }
+
     TcpServer tcpServer;
 };
 

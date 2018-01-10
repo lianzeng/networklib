@@ -19,10 +19,10 @@ namespace  net
         else if (errno == EPIPE || errno == ECONNRESET)
         {
             result.first = Failure;
-            LOG_ERROR << errno << " " << log::strerror_tl(errno);
+            LOG_ERROR << errno << " " << logg::strerror_tl(errno);
         }
         else//EWOULDBLOCK
-            LOG_INFO << errno << " " << log::strerror_tl(errno);
+            LOG_INFO << errno << " " << logg::strerror_tl(errno);
 
         return result;
     }
@@ -39,7 +39,7 @@ namespace  net
         }
         else
         {
-            LOG_ERROR << errno << " " << log::strerror_tl(errno);
+            LOG_ERROR << errno << " " << logg::strerror_tl(errno);
             result.first = Failure;
         }
 

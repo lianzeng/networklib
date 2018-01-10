@@ -46,7 +46,7 @@ int accept(int sockfd, struct sockaddr *addr)
   if(connectfd < 0)
   {
       int savedErr = errno;
-      LOG_ERROR << "accept " << savedErr << " " << log::strerror_tl(savedErr);
+      LOG_ERROR << "accept " << savedErr << " " << logg::strerror_tl(savedErr);
       switch (savedErr)
       {
           case EAGAIN:
