@@ -30,6 +30,7 @@ void loop();
 
  /* If in the same loop thread, cb is run immediately. otherwise store in the task queue.Safe to call from any threads.*/
 void runInLoop(Functor&& cb);
+
 void queueInLoop( Functor&& cb);
 
 void updateChannel(Channel*);

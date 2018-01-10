@@ -28,6 +28,7 @@ void TcpClient::connect()
 
 void TcpClient::newConnection(int sockfd)
 {
+    LOG_TRACE <<"TcpClient connect to server succesfully.";
     using namespace std::placeholders;
     loop_->assertInLoopThread();
     TcpConnectionPtr connectionPtr(new TcpConnection(loop_, sockfd));

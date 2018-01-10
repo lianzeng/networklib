@@ -3,12 +3,21 @@
 //
 
 #include <iostream>
+#include <unistd.h>
+#include "../utils/Logging.hpp"
+#include "../utils/CurrentThread.hpp"
+#include "../net/EventLoop.hpp"
+#include "../utils/InetAddress.hpp"
+#include "../net/TcpServer.hpp"
 
+static int numberThreads = 0;
+
+using namespace net;
 
 class EchoServer
 {
 public:
-    EchoServer()
+    EchoServer(EventLoop* loop, const InetAddress& listenAddr): tcpServer(loop, listenAddr)
     {
 
     }
@@ -17,6 +26,13 @@ public:
 
     }
 
+    void start()
+    {
+        tcpServer.start();
+    }
+
+private:
+    TcpServer tcpServer;
 };
 
 
@@ -24,6 +40,18 @@ public:
 int main(int argc, char* argv[])
 {
 
-    std::cout << argv[0] << " Running Case TestEchoServer \n";
+    LOG_INFO << "Usage: "<< static_cast<const char*>(argv[0])  << " threadNumPerPool(default=0) " ;
+
+    if(argc > 1)
+        numberThreads = atoi(argv[1]);
+
+    EventLoop loop;
+    InetAddress listenAddr(true, 2000);//true  indicate serverip = 127.0.0.1
+    EchoServer echoServer(&loop, listenAddr);
+
+    echoServer.start();
+    loop.loop();
+
+    std::cout << " Running Case TestEchoServer \n";
     return 0;
 }

@@ -27,6 +27,7 @@ Acceptor::Acceptor(EventLoop *loop, const InetAddress &listenAddr, bool reusePor
 
 void Acceptor::listen()
 {
+    LOG_TRACE <<"Acceptor::listen";
     loop_->assertInLoopThread();
     acceptSocket_.listen();
     acceptChannel.enableReading();
@@ -42,6 +43,8 @@ void Acceptor::handRead(TimeStamp)
           newConnectionCallback_(result.first, result.second);
       else
           sockets::close(result.first);
+
+      LOG_TRACE <<"accept new connection, fd = " <<result.first;
     }
     else
     {

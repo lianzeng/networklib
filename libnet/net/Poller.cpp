@@ -84,7 +84,7 @@ void Poller::addNewChannel(Channel* channel)
   channel->set_index(static_cast<int>(pollfdList_.size() - 1));
   channelMap_[channel->fd()] = channel;
   
-  LOG_TRACE << "  fd = " << channel->fd() << " events = " << channel->events();
+  LOG_TRACE << "  fd = " << channel->fd() << " events = " << channel->eventToString();
 }
 
 void Poller::updateExistChannel(Channel* channel)

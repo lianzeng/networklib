@@ -1,5 +1,6 @@
 #include "Channel.hpp"
 #include <poll.h>
+#include <sstream>
 #include "../utils/Logging.hpp"
 
 namespace net
@@ -26,7 +27,7 @@ Channel:: ~Channel()
 
 void Channel::handleEvent(TimeStamp receiveTime)
 {//value refer to: https://github.com/torvalds/linux/blob/ead751507de86d90fa250431e9990a8b881f713c/include/uapi/asm-generic/poll.h
-  LOG_TRACE << "fd = "<<fd_<<" , revents = " <<revents_;
+  LOG_TRACE << "fd = "<<fd_<<" , revents = " <<eventToString(revents_);
   
   if ((revents_ & POLLHUP) && !(revents_ & POLLIN))
   {    
@@ -55,8 +56,24 @@ void Channel::handleEvent(TimeStamp receiveTime)
     
 }
 
+std::string Channel::eventToString(int event)
+{
+    bool unknowEvent = true;
+    std::ostringstream oss;
 
+    if(event & POLLIN)    {oss <<"POLLIN "; unknowEvent = false;}
+    if(event & POLLPRI)   {oss <<"POLLPRI "; unknowEvent = false;}
+    if(event & POLLOUT)   {oss <<"POLLOUT "; unknowEvent = false;}
+    if(event & POLLHUP)   {oss <<"POLLHUP "; unknowEvent = false;}
+    if(event & POLLRDHUP) {oss <<"POLLRDHUP ";unknowEvent = false;}
+    if(event & POLLERR)   {oss <<"POLLERR "; unknowEvent = false;}
+    if(event & POLLNVAL)  {oss <<"POLLNVAL ";unknowEvent = false;}
 
+    if(unknowEvent)
+        return "unknow event";
+    else
+        return oss.str();
+}
 
 
 }

@@ -43,6 +43,9 @@ public:
   void set_index(int idx) {index_ = idx;}
   int index() const {return index_;}
 
+  std::string eventToString() const { return eventToString(events_);}
+  static std::string eventToString(int event);
+
 private:
 
 void update()

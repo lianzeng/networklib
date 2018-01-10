@@ -24,7 +24,10 @@ public:
     Acceptor(EventLoop* loop, const InetAddress& listenAddr, bool reusePort);
     ~Acceptor();
 
-    void setNewConnectionCallback(const NewConnectionCallback & );
+    void setNewConnectionCallback(NewConnectionCallback && cb)
+    {
+        newConnectionCallback_ = std::move(cb);
+    }
 
     void listen();
 

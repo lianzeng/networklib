@@ -55,13 +55,13 @@ int main(int argc, char* argv[])
 {
   if(argc <= 1)
   {
-    std::cout <<"Usage:  " << argv[0] <<  "  host_ip " <<"\n"; 
+    std::cout <<"Usage:  " << argv[0] <<  "  server_ip " <<"\n";
     return -1;
   }
 
-  const uint16_t port = 2000;
+  const uint16_t serverPort = 2000;
   const char* serverIp = argv[1];
-  InetAddress serverAddr(serverIp, port);
+  InetAddress serverAddr(serverIp, serverPort);
 
 
   EventLoop loop;  

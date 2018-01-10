@@ -34,11 +34,21 @@ public:
 
 
   sa_family_t family() const { return addr.sin_family; }
+
   const struct sockaddr* getSockAddr() const 
   { 
    //sockaddr is used for bind/connect, whereas sockaddr_in has meaningful member;
     static_assert(sizeof(struct sockaddr) == sizeof(struct sockaddr_in), "struct sockaddr,sockaddr_in not same size");
     return (const struct sockaddr*)&addr; 
+  }
+
+
+  std::string ipPort() const
+  {
+      int port = ntohs(addr.sin_port);
+      std::string ipaddr(INET_ADDRSTRLEN, ' ');
+      ::inet_ntop(AF_INET, &addr.sin_addr, &ipaddr[0], ipaddr.size());
+      return ipaddr + " " + std::to_string(port);
   }
 
  ~InetAddress()  = default;
