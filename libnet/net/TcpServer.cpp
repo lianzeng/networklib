@@ -28,6 +28,7 @@ TcpServer::~TcpServer()
 void TcpServer::start()
 {
     LOG_TRACE <<"TcpServer ";
+    threadPool->buildThreadPool();
     loop_->runInLoop(std::bind(&Acceptor::listen, acceptor_.get()));
 }
 
@@ -64,6 +65,11 @@ void TcpServer::removeConnectionInLoop(const TcpConnectionPtr& conn)
     auto ioloop = conn->ownerLoop();
     ioloop->runInLoop(std::bind(&TcpConnection::connectionDestroyed, conn));
 
+}
+
+void TcpServer::setThreadsNum(int num)
+{
+    threadPool->setThreadNum(num);
 }
 
 }

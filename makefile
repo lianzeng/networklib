@@ -19,6 +19,11 @@ TestEchoClient.out: $(TestDir)/TestEchoClient.o $(libname)
 	@echo " build finished ok !"
 
 
+TestEchoServer.out: $(TestDir)/TestEchoServer.o $(libname)
+	$(CXX) ${LDFLAGS} -o $@ $^
+	@echo " build finished ok !"
+
+
 $(libname):
 	cd ./libnet && make  -f ./libnet.mk
 	mv ./libnet/$@  ./

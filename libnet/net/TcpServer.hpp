@@ -27,7 +27,7 @@ public:
     void setMessageCallback(MessageCallback&& cb){ messageCallback_  = std::move(cb);}
     void setSendCompleteCallback(SendCompleteCallback&& cb){sendCompleteCallback_ = std::move(cb);}
 
-
+    void setThreadsNum(int num);
 private:
 
     void removeConnection(const TcpConnectionPtr& conn);

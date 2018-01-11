@@ -49,6 +49,10 @@ set(SOURCE_FILES
         libnet/net/TcpServer.cpp
         libnet/net/TcpServer.hpp
         libnet/net/EventLoopThreadPool.cpp
-        libnet/net/EventLoopThreadPool.hpp)
+        libnet/net/EventLoopThreadPool.hpp
+        libnet/net/EventLoopThread.cpp
+        libnet/net/EventLoopThread.hpp
+        libnet/utils/CountDownLatch.cpp
+        libnet/utils/CountDownLatch.hpp)
 
 add_executable(multiThread ${SOURCE_FILES})

@@ -28,6 +28,7 @@ public:
 
     void start()
     {
+        tcpServer.setThreadsNum(numberThreads);
         tcpServer.start();
     }
 

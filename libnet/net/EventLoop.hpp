@@ -28,7 +28,8 @@ EventLoop();
 
 void loop();
 
- /* If in the same loop thread, cb is run immediately. otherwise store in the task queue.Safe to call from any threads.*/
+ /* If in the same loop thread, cb is run immediately. otherwise store in the task queue.Safe to call from any threads.
+  runInLoop() is the key function for Async call. */
 void runInLoop(Functor&& cb);
 
 void queueInLoop( Functor&& cb);
@@ -54,8 +55,8 @@ bool isInLoopThread() const
   return threadId_ == currentThread::tid();
 }
 
-  EventLoop(const EventLoop&) = delete;
-  EventLoop& operator=(const EventLoop&) = delete;
+EventLoop(const EventLoop&) = delete;
+EventLoop& operator=(const EventLoop&) = delete;
 
 
 private:

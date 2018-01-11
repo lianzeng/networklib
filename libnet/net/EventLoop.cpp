@@ -18,8 +18,12 @@ EventLoop::EventLoop():
   poller_(PollerBase::newDefaultPoller(this)),
   quit_(false)
 {
-   if (t_loopInThisThread != nullptr) assert(0);
-   else t_loopInThisThread = this;
+   if (t_loopInThisThread != nullptr)
+   {
+     LOG_FATAL <<"already exist one EventLoop in current thread.";
+   }
+   else
+     t_loopInThisThread = this;
 }
 
 EventLoop::~EventLoop()
