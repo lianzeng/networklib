@@ -8,7 +8,7 @@ SRC_FOLDERS  += ./libnet/utils
 VPATH := $(SRC_FOLDERS)
 TestDir := ./libnet/test
 INC_DIRS = $(foreach dir, $(SRC_FOLDERS), -I$(dir))
-LDFLAGS= -L. -lpthread   -lnet  #note: -lnet rather than -llibnet.a
+LDFLAGS= -L. -pthread   -lnet  #note:1) -lnet instead of -llibnet.a ; 2) -pthread instead of -lpthread;
 CPPFLAGS=-g -std=c++11 $(INC_DIRS)
 CXX=g++ 
 

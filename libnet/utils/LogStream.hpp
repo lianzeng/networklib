@@ -1,5 +1,7 @@
-#ifndef _LOG_STEAM_HPP
-#define  _LOG_STEAM_HPP
+#ifndef _LOG_STEAM_HPP
+
+#define  _LOG_STEAM_HPP
+
 
 #include <cstring>
 #include <string>
@@ -29,7 +31,7 @@ FixedBuffer(const FixedBuffer&) = delete;
 FixedBuffer& operator=(const FixedBuffer&) = delete;
 
 private:
-  int available() const {return data_ + SIZE - curr;}
+  int available() const {return static_cast<int>(data_ + SIZE - curr);}
 private:
   char data_[SIZE];
   char* curr;

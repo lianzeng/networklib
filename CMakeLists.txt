@@ -1,7 +1,9 @@
 cmake_minimum_required(VERSION 3.8)
 project(multiThread)
 
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 11)#enable c++11 standard
+
+set(CMAKE_CXX_FLAGS -pthread)  #this line is needed for std::thread, otherwise will cause link error(undefined reference of pthread_create).
 
 set(SOURCE_FILES
         libnet/net/Buffer.cpp

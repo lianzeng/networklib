@@ -3,12 +3,11 @@
 //
 
 #include <iostream>
-#include <unistd.h>
 #include "../utils/Logging.hpp"
-#include "../utils/CurrentThread.hpp"
 #include "../net/EventLoop.hpp"
 #include "../utils/InetAddress.hpp"
 #include "../net/TcpServer.hpp"
+
 
 static int numberThreads = 0;
 

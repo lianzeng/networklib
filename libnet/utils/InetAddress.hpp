@@ -47,7 +47,7 @@ public:
   {
       int port = ntohs(addr.sin_port);
       std::string ipaddr(INET_ADDRSTRLEN, ' ');
-      ::inet_ntop(AF_INET, &addr.sin_addr, &ipaddr[0], ipaddr.size());
+      ::inet_ntop(AF_INET, &addr.sin_addr, &ipaddr[0], static_cast<socklen_t >(ipaddr.size()));
       return ipaddr + " " + std::to_string(port);
   }
 

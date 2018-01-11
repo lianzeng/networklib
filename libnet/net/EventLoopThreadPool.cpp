@@ -20,8 +20,9 @@ namespace  net
     {
         if(threadPool_.empty())
             return baseLoop_;
-        else//round-robin
+        else
         {
+            LOG_TRACE<<" round-robin to thread_index: " << nextThreadToBeSelect ;
             auto ioloop = threadPool_[nextThreadToBeSelect]->loop();
             nextThreadToBeSelect = (nextThreadToBeSelect + 1) % threadPool_.size();
             return ioloop;
@@ -36,6 +37,6 @@ namespace  net
             threadPool_.push_back(newThread);
         }
 
-        LOG_TRACE <<"EventLoopThreadPool::buildThreadPool, "<<threadsNum <<" threads created succefully.";
+        LOG_TRACE <<threadsNum <<" threads created succefully.";
     }
 }

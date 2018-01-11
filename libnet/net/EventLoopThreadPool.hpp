@@ -29,7 +29,7 @@ private:
 EventLoop* baseLoop_;
 int        threadsNum;
 
-int nextThreadToBeSelect;
+size_t nextThreadToBeSelect;
 std::vector<std::shared_ptr<EventLoopThread > > threadPool_;
 
 };
