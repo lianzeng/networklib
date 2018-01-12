@@ -22,7 +22,7 @@ namespace  net
             return baseLoop_;
         else
         {
-            LOG_TRACE<<" round-robin to thread_index: " << nextThreadToBeSelect ;
+            LOG_INFO<<" round-robin to thread_index: " << nextThreadToBeSelect ;
             auto ioloop = threadPool_[nextThreadToBeSelect]->loop();
             nextThreadToBeSelect = (nextThreadToBeSelect + 1) % threadPool_.size();
             return ioloop;
@@ -37,6 +37,6 @@ namespace  net
             threadPool_.push_back(newThread);
         }
 
-        LOG_TRACE <<threadsNum <<" threads created succefully.";
+        LOG_INFO <<threadsNum <<" threads created succefully.";
     }
 }

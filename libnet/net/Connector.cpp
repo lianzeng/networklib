@@ -75,7 +75,7 @@ void Connector::connect()
 
 void Connector::connecting(int sockfd)
 {  
-   LOG_TRACE <<" fd = "<<sockfd;
+   LOG_INFO <<" fd = "<<sockfd;
    setState(States::Connecting);
    assert(!channel_);
    channel_.reset(new Channel(loop_, sockfd));
@@ -88,7 +88,7 @@ void Connector::connecting(int sockfd)
 
 void Connector::handleWrite()
 {
-  LOG_TRACE <<"fd = "<< channel_->fd() <<" , state =  " << static_cast<int>(state_);
+  LOG_INFO <<"fd = "<< channel_->fd() <<" , state =  " << static_cast<int>(state_);
   if(state_ == States::Connecting)
   {
     removeAndFreeChannel();//the life of connect_channel is over, need create new data_channel for same socketfd.

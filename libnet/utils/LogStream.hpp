@@ -39,11 +39,11 @@ private:
 
 class LogStream
 {
-static const unsigned int FIXED_BUFF_SIZE = 1024*4;
+static const unsigned int MAX_LOG_SIZE_PER_LINE = 1024*4;
 
 public:
 using self = LogStream;
-using LogBuffer = FixedBuffer<FIXED_BUFF_SIZE>;
+using LogBuffer = FixedBuffer<MAX_LOG_SIZE_PER_LINE>;
 
 LogStream() = default; 
 ~LogStream() = default;

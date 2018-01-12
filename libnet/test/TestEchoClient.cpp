@@ -32,14 +32,13 @@ private:
 
   void onConnection(const TcpConnectionPtr& conn)
   {
-    LOG_TRACE << "EchoClient connected ! ";
+    LOG_INFO << "EchoClient connected ! ";
     conn->send("hello!\n");
   }
 
-  void onMessage(const TcpConnectionPtr& conn, Buffer* buf, TimeStamp)
+  void onMessage(const TcpConnectionPtr& conn, Buffer* buffer, TimeStamp)
   {
-    std::string msg(buf->retrieveAll());
-    LOG_TRACE<< msg ;
+    LOG_TRACE <<"EchoClient receive message: "<< buffer->retrieveAll();
     conn->send("world!\n");
   }
 

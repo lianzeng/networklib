@@ -14,7 +14,7 @@ LogLevel initLogLevel()
   else if (::getenv("LOG_DEBUG"))
     return LogLevel::DEBUG;
   else
-    return LogLevel::TRACE;
+    return LogLevel::INFO;
 }
 
 __thread char t_errnobuf[512] = {0};

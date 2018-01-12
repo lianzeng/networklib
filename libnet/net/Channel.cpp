@@ -27,7 +27,7 @@ Channel:: ~Channel()
 
 void Channel::handleEvent(TimeStamp receiveTime)
 {//value refer to: https://github.com/torvalds/linux/blob/ead751507de86d90fa250431e9990a8b881f713c/include/uapi/asm-generic/poll.h
-  LOG_TRACE << "fd = "<<fd_<<" , revents = " <<eventToString(revents_);
+  LOG_INFO << "fd = "<<fd_<<" , revents = " <<eventToString(revents_);
   
   if ((revents_ & POLLHUP) && !(revents_ & POLLIN))
   {    
@@ -36,7 +36,7 @@ void Channel::handleEvent(TimeStamp receiveTime)
 
   if (revents_ & POLLNVAL)
   {
-    LOG_TRACE << "fd = " << fd_ << " Channel::handle_event() POLLNVAL";
+    LOG_INFO << "fd = " << fd_ << " Channel::handle_event() POLLNVAL";
   }
 
   if (revents_ & (POLLERR | POLLNVAL))

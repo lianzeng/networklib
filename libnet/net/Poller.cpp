@@ -30,17 +30,17 @@ PollerBase::ChannelList  Poller::poll(const int timeoutMs, TimeStamp& retTime)
   
   if(numEvents > 0)
   {
-    LOG_TRACE<< " poll() : " << numEvents << " events happend !";
+    LOG_INFO<< " poll() : " << numEvents << " events happend !";
     fillActiveChannels(numEvents, activeChannels);
   }
   else if(numEvents == 0)
   {
-    LOG_TRACE<< " poll() : nothing happend !";
+    LOG_INFO<< " poll() : nothing happend !";
   }
   else
   {
     if(errno != EINTR)
-      LOG_TRACE<< " poll() : " <<errno << "  Error happend !";  
+      LOG_INFO<< " poll() : " <<errno << "  Error happend !";
   }
   return activeChannels;
 }
@@ -84,12 +84,12 @@ void Poller::addNewChannel(Channel* channel)
   channel->set_index(static_cast<int>(pollfdList_.size() - 1));
   channelMap_[channel->fd()] = channel;
   
-  LOG_TRACE << "  fd = " << channel->fd() << " events = " << channel->eventToString();
+  LOG_INFO << "  fd = " << channel->fd() << " events = " << channel->eventToString();
 }
 
 void Poller::updateExistChannel(Channel* channel)
 {
-  LOG_TRACE << " fd = " << channel->fd() << " events = " << channel->events();
+  LOG_INFO << " fd = " << channel->fd() << " events = " << channel->events();
   
   auto& pfd = pollfdList_[channel->index()];
   assert(pfd.fd == channel->fd() || pfd.fd == -channel->fd()-1);

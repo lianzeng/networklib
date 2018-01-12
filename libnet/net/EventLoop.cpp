@@ -34,7 +34,7 @@ void EventLoop::loop()
 {
   assertInLoopThread();//loop can only run within thread which create eventloop instance.
   
-  LOG_TRACE << "EventLoop " << static_cast<const void*>(this) << " start looping";
+  LOG_INFO << "EventLoop " << static_cast<const void*>(this) << " start looping";
 
   quit_ = false;
   while (!quit_)
@@ -50,13 +50,13 @@ void EventLoop::loop()
     doPendingFunctors();
   }
   
-  LOG_TRACE << "EventLoop " << static_cast<const void*>(this)  << " stop looping";
+  LOG_INFO << "EventLoop " << static_cast<const void*>(this)  << " stop looping";
     
 }
 
 void EventLoop::doPendingFunctors()
 {
-  LOG_TRACE <<"  PendingFunctors num = "<<pendingFunctors_.size();  
+  LOG_INFO <<"  PendingFunctors num = "<<pendingFunctors_.size();
   
   decltype(pendingFunctors_) functors;
   {
@@ -97,7 +97,7 @@ void EventLoop::removeChannel(Channel* cn)
   assert(cn->ownerLoop() == this);
   assertInLoopThread();
   poller_->removeChannel(cn);
-  LOG_TRACE << "  fd = " << cn->fd();
+  LOG_INFO << "  fd = " << cn->fd();
 }
 
 

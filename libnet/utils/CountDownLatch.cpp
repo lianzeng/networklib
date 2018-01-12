@@ -10,7 +10,7 @@ void CountDownLatch::wait()
     std::unique_lock<std::mutex> lock(mutex);
     while(count_ > 0)
     {
-        LOG_TRACE <<"CountDownLatch wait, count =  " << count_;
+        LOG_INFO <<"CountDownLatch wait, count =  " << count_;
         condition.wait(lock);
     }
 
@@ -22,7 +22,7 @@ void CountDownLatch::countDown()
     --count_;
     if(count_ == 0)
     {
-        LOG_TRACE <<"CountDownLatch::notify all.";
+        LOG_INFO <<"CountDownLatch::notify all.";
         condition.notify_all();
     }
 

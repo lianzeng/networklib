@@ -16,7 +16,7 @@ acceptor_(new Acceptor(loop_, listenAddr, false)),
 threadPool(new EventLoopThreadPool(loop_))
 {
     using namespace std::placeholders;
-    LOG_TRACE <<"ip port :"<< listenAddr.ipPort();
+    LOG_INFO <<"ip port :"<< listenAddr.ipPort();
     acceptor_->setNewConnectionCallback(std::bind(&TcpServer::newConnection, this, _1, _2));
 }
 
@@ -27,14 +27,14 @@ TcpServer::~TcpServer()
 
 void TcpServer::start()
 {
-    LOG_TRACE <<"TcpServer ";
+    LOG_INFO <<"TcpServer ";
     threadPool->buildThreadPool();
     loop_->runInLoop(std::bind(&Acceptor::listen, acceptor_.get()));
 }
 
 void TcpServer::newConnection(int fd, const InetAddress &peerAddr)
 {
-    LOG_TRACE <<"TcpServer receive new connection from: "<< peerAddr.ipPort();
+    LOG_INFO <<"TcpServer receive new connection from: "<< peerAddr.ipPort();
     loop_->assertInLoopThread();
 
     using namespace std::placeholders;
@@ -59,7 +59,7 @@ void TcpServer::removeConnection(const TcpConnectionPtr& conn)
 
 void TcpServer::removeConnectionInLoop(const TcpConnectionPtr& conn)
 {
-    LOG_TRACE <<"TcpServer remove connection";
+    LOG_INFO <<"TcpServer remove connection";
     loop_->assertInLoopThread();
     connectionList.erase(std::remove(connectionList.begin(),connectionList.end(), conn),connectionList.end());
     auto ioloop = conn->ownerLoop();

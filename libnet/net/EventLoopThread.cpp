@@ -28,7 +28,7 @@ namespace net
 
     void EventLoopThread::threadMain()
     {
-        LOG_TRACE <<" start a new loop thread.";
+        LOG_INFO <<" start a new loop thread.";
 
         EventLoop eloop;
         loop_ = &eloop;

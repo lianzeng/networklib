@@ -22,13 +22,13 @@ TcpClient::~TcpClient()
 
 void TcpClient::connect()
 {
-  LOG_TRACE <<" TcpClient start connect ";
+  LOG_INFO <<" TcpClient start connect ";
   connector_->start();
 }
 
 void TcpClient::newConnection(int sockfd)
 {
-    LOG_TRACE <<"TcpClient connect to server succesfully.";
+    LOG_INFO <<"TcpClient connect to server succesfully.";
     using namespace std::placeholders;
     loop_->assertInLoopThread();
     TcpConnectionPtr connectionPtr(new TcpConnection(loop_, sockfd));

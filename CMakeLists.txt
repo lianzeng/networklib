@@ -38,14 +38,6 @@ set(SOURCE_FILES
         libnet/net/SendBuffer.hpp
         libnet/net/ReceiveBuffer.cpp
         libnet/net/ReceiveBuffer.hpp
-        libnet/libnet.mk
-
-
-        libnet/test/TestEchoServer.cpp
-
-        makefile
-        README.md
-        readme.txt
         libnet/net/Acceptor.cpp
         libnet/net/Acceptor.hpp
         libnet/net/TcpServer.cpp
@@ -55,6 +47,16 @@ set(SOURCE_FILES
         libnet/net/EventLoopThread.cpp
         libnet/net/EventLoopThread.hpp
         libnet/utils/CountDownLatch.cpp
-        libnet/utils/CountDownLatch.hpp)
+        libnet/utils/CountDownLatch.hpp
+
+        libnet/libnet.mk  #to build libnet.a
+
+
+        libnet/test/TestEchoServer.cpp
+
+        makefile  #to build testcase
+        README.md
+        readme.txt
+        )
 
 add_executable(multiThread ${SOURCE_FILES})

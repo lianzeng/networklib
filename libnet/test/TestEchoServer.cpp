@@ -34,7 +34,7 @@ public:
 private:
     void onConnection(const TcpConnectionPtr& conn)
     {
-        LOG_TRACE<<"EchoServer connected ! ";
+        LOG_INFO<<"EchoServer connected ! ";
         conn->send("Nice !");
     }
 
