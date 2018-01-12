@@ -16,3 +16,10 @@ linux multi thread programming in C++11, refer to muduo lib.
 
 7)test cases could run independently, with valgrind memory detect;
 
+
+
+# This project is build on following environment:
+  Linux VBox 3.19.0-15-generic #15-Ubuntu SMP Thu Apr 16 23:32:37 UTC 2015 x86_64 x86_64 x86_64 GNU/Linux; Ubuntu 15.04;
+  
+# Develop Tool used: Linux Tool(Git + Clion_Linux_Version_2017_2_1) + Windows Tool (SecureCRT6.7.1_X64 + XMing6.9.0.31)
+
