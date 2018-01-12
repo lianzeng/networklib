@@ -35,7 +35,7 @@ void TcpServer::start()
 void TcpServer::newConnection(int fd, const InetAddress &peerAddr)
 {
     LOG_INFO <<"TcpServer receive new connection from: "<< peerAddr.ipPort();
-    loop_->assertInLoopThread();
+    loop_->assertInOwnerThread();
 
     using namespace std::placeholders;
 
@@ -60,7 +60,7 @@ void TcpServer::removeConnection(const TcpConnectionPtr& conn)
 void TcpServer::removeConnectionInLoop(const TcpConnectionPtr& conn)
 {
     LOG_INFO <<"TcpServer remove connection";
-    loop_->assertInLoopThread();
+    loop_->assertInOwnerThread();
     connectionList.erase(std::remove(connectionList.begin(),connectionList.end(), conn),connectionList.end());
     auto ioloop = conn->ownerLoop();
     ioloop->runInLoop(std::bind(&TcpConnection::connectionDestroyed, conn));

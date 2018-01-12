@@ -32,7 +32,7 @@ EventLoop::~EventLoop()
 
 void EventLoop::loop()
 {
-  assertInLoopThread();//loop can only run within thread which create eventloop instance.
+  assertInOwnerThread();//loop can only run within thread which create eventloop instance.
   
   LOG_INFO << "EventLoop " << static_cast<const void*>(this) << " start looping";
 
@@ -60,7 +60,7 @@ void EventLoop::doPendingFunctors()
   
   decltype(pendingFunctors_) functors;
   {
-    std::lock_guard< std::mutex> lock(mutex_);
+    std::lock_guard< std::mutex> lock(mutex_);//this race section is high efficient due to cheap swap operation;
     functors.swap(pendingFunctors_);
   }
 
@@ -70,7 +70,7 @@ void EventLoop::doPendingFunctors()
 
 void EventLoop::runInLoop(Functor&& cb)
 {
-  if(isInLoopThread())
+  if(inOwnerThread())
     cb();
   else
     queueInLoop(std::move(cb));
@@ -80,7 +80,7 @@ void EventLoop::queueInLoop(Functor&& cb)
 {
   {
     std::lock_guard<std::mutex> lock (mutex_);
-    pendingFunctors_.push_back(std::move(cb));  // emplace_back
+    pendingFunctors_.push_back(std::move(cb));
   }
   
 }
@@ -88,17 +88,24 @@ void EventLoop::queueInLoop(Functor&& cb)
 void EventLoop::updateChannel(Channel* cn)
 {
   assert(cn->ownerLoop() == this);
-  assertInLoopThread();
+  assertInOwnerThread();
   poller_->updateChannel(cn);
 }
 
 void EventLoop::removeChannel(Channel* cn)
 {
   assert(cn->ownerLoop() == this);
-  assertInLoopThread();
+  assertInOwnerThread();
   poller_->removeChannel(cn);
   LOG_INFO << "  fd = " << cn->fd();
 }
 
+
+
+void EventLoop::assertInOwnerThread()
+{
+  if(!inOwnerThread())
+    LOG_FATAL << "EventLoop is created by threadid = " << threadId_ << " ,but current running id = " << currentThread::tid();
+}
 
 }

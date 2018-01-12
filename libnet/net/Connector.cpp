@@ -27,7 +27,7 @@ void Connector::start()
 
 void Connector::startInloop()
 {
-    loop_->assertInLoopThread();
+  loop_->assertInOwnerThread();
     assert(state_ == States::Disconnected);
     connect();
 }

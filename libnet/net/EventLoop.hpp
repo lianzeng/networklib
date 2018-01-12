@@ -38,10 +38,9 @@ void updateChannel(Channel*);
 void removeChannel(Channel*);
 
 void quit() {quit_ = true;}
-void assertInLoopThread() const
-{
-  if(!isInLoopThread()) assert(0);
-}
+
+void assertInOwnerThread();
+
 
 private:
 
@@ -50,7 +49,7 @@ void doPendingFunctors();
 
 
 
-bool isInLoopThread() const
+bool inOwnerThread() const
 {
   return threadId_ == currentThread::tid();
 }

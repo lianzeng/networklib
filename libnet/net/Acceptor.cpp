@@ -28,14 +28,14 @@ Acceptor::Acceptor(EventLoop *loop, const InetAddress &listenAddr, bool reusePor
 void Acceptor::listen()
 {
     LOG_INFO <<"Acceptor::listen";
-    loop_->assertInLoopThread();
+    loop_->assertInOwnerThread();
     acceptSocket_.listen();
     acceptChannel.enableReading();
 }
 
 void Acceptor::handRead(TimeStamp)
 {
-    loop_->assertInLoopThread();
+    loop_->assertInOwnerThread();
     auto result = acceptSocket_.accept();
     if(result.first >= 0)
     {

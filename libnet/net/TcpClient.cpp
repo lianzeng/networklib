@@ -30,7 +30,7 @@ void TcpClient::newConnection(int sockfd)
 {
     LOG_INFO <<"TcpClient connect to server succesfully.";
     using namespace std::placeholders;
-    loop_->assertInLoopThread();
+    loop_->assertInOwnerThread();
     TcpConnectionPtr connectionPtr(new TcpConnection(loop_, sockfd));
     connectionPtr->setMessageCallback(messageCallback_);
     connectionPtr->setSendCompleteCallback(sendCompleteCallback_);

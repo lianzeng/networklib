@@ -34,7 +34,7 @@ void TcpConnection::send(std::string&& msg)
 
 void TcpConnection::sendInLoop(const std::string & msg)
 {
-    loop_->assertInLoopThread();
+    loop_->assertInOwnerThread();
 
     SendBuffer::Result sendStatues = {SendBuffer::Success, 0};//<ok, wroteBytes>
     if(sendingQueueEmpty())
@@ -63,7 +63,7 @@ void TcpConnection::sendInLoop(const std::string & msg)
 
 void TcpConnection::connectEstablished() {
     LOG_INFO <<"TcpConnection::connectEstablished: fd = " << channelPtr->fd();
-    loop_->assertInLoopThread();
+    loop_->assertInOwnerThread();
     setState(Connected);
     channelPtr->enableReading();
     connectionCallback_(shared_from_this());
@@ -72,7 +72,7 @@ void TcpConnection::connectEstablished() {
 
 void TcpConnection::handleRead(TimeStamp receiveTime) {
     LOG_INFO <<"TcpConnection::handleRead: fd = " << channelPtr->fd();
-    loop_->assertInLoopThread();
+    loop_->assertInOwnerThread();
     auto readBytes = receivedBuffer.receive();
     if(readBytes > 0)
         messageCallback_(shared_from_this(), &receivedBuffer, receiveTime);
@@ -85,7 +85,7 @@ void TcpConnection::handleRead(TimeStamp receiveTime) {
 void TcpConnection::handleWrite() {
 
     LOG_INFO <<"TcpConnection::handleWrite: fd = " << channelPtr->fd();
-    loop_->assertInLoopThread();
+    loop_->assertInOwnerThread();
     auto result = sendBuffer.send();
     if(result.first && sendBuffer.readbleBytes() == 0)
     {
@@ -100,7 +100,7 @@ void TcpConnection::handleWrite() {
 void TcpConnection::handleClose() {
 
     LOG_INFO <<"TcpConnection::handleClose: fd = " << channelPtr->fd();
-    loop_->assertInLoopThread();
+    loop_->assertInOwnerThread();
     setState(Disconnected);
     channelPtr->disableEvents();
     closeCallback_(shared_from_this());
@@ -109,12 +109,12 @@ void TcpConnection::handleClose() {
 void TcpConnection::connectionDestroyed()
 {
     LOG_INFO <<"TcpConnection::connectionDestroyed: fd = " << channelPtr->fd();
-    loop_->assertInLoopThread();
+    loop_->assertInOwnerThread();
     channelPtr->removeSelf();
 }
 
 void TcpConnection::handleError() {
-    loop_->assertInLoopThread();
+    loop_->assertInOwnerThread();
     int err = sockets::getSocketError(channelPtr->fd());
     LOG_ERROR << "TcpConnection::handleError " << " - SO_ERROR = " << err << " " << logg::strerror_tl(err);
 }

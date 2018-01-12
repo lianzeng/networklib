@@ -32,7 +32,7 @@ virtual ~PollerBase();
 
   void assertInLoopThread() const
   {
-    ownerLoop_->assertInLoopThread();
+      ownerLoop_->assertInOwnerThread();
   }
 
 
