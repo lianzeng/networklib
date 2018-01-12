@@ -25,7 +25,7 @@ classA(int i):m(i)
 
 void func(int v)
 {
- std::cout <<"\n value is "<<m<<"and "<<v <<"\n";
+ std::cout <<"\n value is "<< m <<" and "<<v <<"\n";
 }
 
 private:
