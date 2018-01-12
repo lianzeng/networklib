@@ -1,5 +1,5 @@
 user guide:
-
+0)environment:  Linux VBox 3.19.0-15-generic #15-Ubuntu SMP Thu Apr 16 23:32:37 UTC 2015 x86_64 x86_64 x86_64 GNU/Linux; Ubuntu 15.04; 
 1)excute command "make xxx" under dir multiThread/ will generate target;
 2)run case:
     ./TestEchoClient.out  127.0.0.1
