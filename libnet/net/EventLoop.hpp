@@ -47,7 +47,10 @@ private:
 
 void doPendingFunctors();
 
+void wakeUp();//wakeup to process pending functors
+void handleWakeUp();
 
+static int createEventfd();
 
 bool inOwnerThread() const
 {
@@ -67,7 +70,10 @@ private:
  std::unique_ptr<PollerBase> poller_;
 
  std::atomic<bool> quit_;//enable quit by other thread
- 
+
+ int wakeupFd_;
+ std::unique_ptr<Channel> wakeupChannel_;
+
 };
 
 

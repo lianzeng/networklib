@@ -3,6 +3,8 @@
 #include "Channel.hpp"
 #include "../utils/TimeStamp.hpp"
 #include "../utils/Logging.hpp"
+#include "SocketsOps.hpp"
+#include <sys/eventfd.h>
 
 namespace
 {
@@ -16,7 +18,9 @@ namespace net
 EventLoop::EventLoop():
   threadId_(currentThread::tid()),
   poller_(PollerBase::newDefaultPoller(this)),
-  quit_(false)
+  quit_(false),
+  wakeupFd_(createEventfd()),
+  wakeupChannel_(new Channel(this, wakeupFd_))
 {
    if (t_loopInThisThread != nullptr)
    {
@@ -24,6 +28,9 @@ EventLoop::EventLoop():
    }
    else
      t_loopInThisThread = this;
+
+   wakeupChannel_->setReadCallback(std::bind(&EventLoop::handleWakeUp, this));
+   wakeupChannel_->enableReading();
 }
 
 EventLoop::~EventLoop()
@@ -82,7 +89,9 @@ void EventLoop::queueInLoop(Functor&& cb)
     std::lock_guard<std::mutex> lock (mutex_);
     pendingFunctors_.push_back(std::move(cb));
   }
-  
+
+  if(!inOwnerThread())
+      wakeUp();
 }
 
 void EventLoop::updateChannel(Channel* cn)
@@ -107,5 +116,30 @@ void EventLoop::assertInOwnerThread()
   if(!inOwnerThread())
     LOG_FATAL << "EventLoop is created by threadid = " << threadId_ << " ,but current running id = " << currentThread::tid();
 }
+
+void EventLoop::wakeUp()
+{
+  uint64_t dummy;
+  sockets::write(wakeupFd_, &dummy, sizeof(dummy));
+}
+
+void EventLoop::handleWakeUp()
+{
+  LOG_TRACE <<"EventLoop is waked up to process pending functors";
+  uint64_t dummy;
+  auto bytes = sockets::read(wakeupFd_, reinterpret_cast<char*>(&dummy), sizeof(dummy));
+  if(bytes != sizeof(dummy))
+      LOG_ERROR <<"read wakeupfd is diff with write bytes.";
+}
+
+int EventLoop::createEventfd()
+{
+    auto efd = ::eventfd(0, EFD_NONBLOCK | EFD_CLOEXEC);
+    if(efd < 0)
+        LOG_FATAL <<"Fail to create eventfd";
+    return efd;
+}
+
+
 
 }

@@ -24,8 +24,9 @@ Poller::~Poller()
 
 PollerBase::ChannelList  Poller::poll(const int timeoutMs, TimeStamp& retTime)
 {
+  //int ppoll(struct pollfd *fds, nfds_t nfds, const struct timespec *, const sigset_t *sigmask); to ignore SIGPIPE;
   ChannelList activeChannels;
-  int numEvents = ::poll(pollfdList_.data(), pollfdList_.size(), timeoutMs);//int ppoll(struct pollfd *fds, nfds_t nfds, const struct timespec *, const sigset_t *sigmask);
+  int numEvents = ::poll(pollfdList_.data(), pollfdList_.size(), timeoutMs);
   retTime = TimeStamp::now();
   
   if(numEvents > 0)
