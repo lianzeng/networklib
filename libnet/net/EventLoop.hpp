@@ -4,9 +4,9 @@
 
 
 #include "../utils/CurrentThread.hpp"
+#include "TimerCallback.hpp"
 #include <mutex>
 #include <vector>
-#include <cassert>
 #include <atomic>
 #include <memory>
 
@@ -15,7 +15,8 @@ namespace net
 
 class Channel;
 class PollerBase;
-
+class TimerCallback;
+class TimerCallbackQueue;
 
 using Functor = std::function<void()>;
 
@@ -41,6 +42,7 @@ void quit() {quit_ = true;}
 
 void assertInOwnerThread();
 
+void registerTimerCallback(TimerCallback*);
 
 private:
 
@@ -74,6 +76,7 @@ private:
  int wakeupFd_;
  std::unique_ptr<Channel> wakeupChannel_;
 
+ std::unique_ptr<TimerCallbackQueue> timerQueue_;
 };
 
 

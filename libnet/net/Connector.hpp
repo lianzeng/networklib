@@ -10,7 +10,7 @@ namespace net
 class EventLoop;
 class Channel;
 
-class Connector
+class Connector: public  std::enable_shared_from_this<Connector>
 {
 public:
 

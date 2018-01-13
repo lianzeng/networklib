@@ -3,6 +3,7 @@
 #include "Channel.hpp"
 #include "../utils/Logging.hpp"
 #include "SocketsOps.hpp"
+#include "TimerCallback.hpp"
 #include <functional>
 
 
@@ -27,7 +28,7 @@ void Connector::start()
 
 void Connector::startInloop()
 {
-  loop_->assertInOwnerThread();
+    loop_->assertInOwnerThread();
     assert(state_ == States::Disconnected);
     connect();
 }
@@ -133,10 +134,15 @@ void Connector::removeAndFreeChannel()
 
 void Connector::retry(int sockfd)
 {
-  LOG_INFO <<" close fd =  "<<channel_->fd();
+  const int retry_period = 3;//3seconds
+  LOG_INFO <<" close fd =  "<<channel_->fd() <<", retry after "<< retry_period <<"s.";
+
   sockets::close(channel_->fd());
   setState(States::Disconnected);
-  //loop_->runAfter
+
+  auto when = TimeStamp::now() + retry_period;
+  auto timerCb = new TimerCallback(std::bind(&Connector::startInloop, shared_from_this()), when, retry_period);
+  loop_->registerTimerCallback(timerCb);
 }
 
 void Connector::freeChannel()

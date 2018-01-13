@@ -11,6 +11,8 @@
 /// Time stamp in UTC, in microseconds resolution.
 class TimeStamp
 {
+    friend bool operator<(const TimeStamp& lhs, const TimeStamp& rhs);
+    friend bool operator==(const TimeStamp& lhs, const TimeStamp& rhs);
 public:
 TimeStamp(int64_t value):microSeconds(value)
 {
@@ -18,6 +20,10 @@ TimeStamp(int64_t value):microSeconds(value)
 
 ~TimeStamp() = default;
 
+static TimeStamp invalid()
+{
+    return TimeStamp(0);
+}
 
 static TimeStamp now()
 {
@@ -27,28 +33,46 @@ static TimeStamp now()
   return TimeStamp(seconds * MicroSecondsPerSecond + tv.tv_usec);
 }
 
-  std::pair<int64_t, int64_t>  get() const 
-  {    
-    return {microSeconds/MicroSecondsPerSecond, microSeconds % MicroSecondsPerSecond}; 
-  }
+static struct timespec timerDiff(const TimeStamp& t1, const TimeStamp& t2)
+{
+    auto diffms = t1.microSeconds - t2.microSeconds;
+    if(diffms < 100) diffms = 100;
+    struct timespec ts;
+    ts.tv_sec = static_cast<time_t >(diffms / MicroSecondsPerSecond);
+    ts.tv_nsec = static_cast<long>(diffms % MicroSecondsPerSecond);
+    return  ts;
+}
 
-  void formatSeconds(char (&timesec)[32]) const
-  {
+std::pair<int64_t, int64_t>  get() const
+{
+    return {microSeconds/MicroSecondsPerSecond, microSeconds % MicroSecondsPerSecond};
+}
+
+bool valid() const {return microSeconds > 0;}
+
+void formatSeconds(char (&timesec)[32]) const
+{
     time_t seconds = static_cast<time_t>(microSeconds/MicroSecondsPerSecond);
-    struct tm tm_time;        
-    ::gmtime_r(&seconds, &tm_time); 
+    struct tm tm_time;
+    ::gmtime_r(&seconds, &tm_time);
     int len = snprintf(timesec, sizeof(timesec), "%4d%02d%02d %02d:%02d:%02d",
                           tm_time.tm_year + 1900, tm_time.tm_mon + 1, tm_time.tm_mday,
                           tm_time.tm_hour, tm_time.tm_min, tm_time.tm_sec);
     assert(len == 17);
-  }
+}
 
-  void formatMs(char (&timeMs)[32])const
-  {
+void formatMs(char (&timeMs)[32])const
+{
     int ms = static_cast<int>(microSeconds % MicroSecondsPerSecond);
     int length = snprintf(timeMs, sizeof (timeMs), ".%06d  ", ms);
-    assert(length == 9); 
-  }
+    assert(length == 9);
+}
+
+TimeStamp operator+(double seconds) const
+{
+    return TimeStamp(microSeconds + static_cast<int64_t >(seconds * MicroSecondsPerSecond) );
+}
+
 
 TimeStamp(const TimeStamp&) = default;
 TimeStamp& operator=(const TimeStamp&) = default;
@@ -59,6 +83,17 @@ private:
 int64_t microSeconds;
 
 };
+
+inline bool operator<(const TimeStamp& lhs, const TimeStamp& rhs)
+{
+    return lhs.microSeconds < rhs.microSeconds;
+}
+
+inline bool operator==(const TimeStamp& lhs, const TimeStamp& rhs)
+{
+    return lhs.microSeconds == rhs.microSeconds;
+}
+
 
 #endif
 

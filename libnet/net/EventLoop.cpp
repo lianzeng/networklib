@@ -1,10 +1,10 @@
 #include "EventLoop.hpp"
 #include "PollerBase.hpp"
 #include "Channel.hpp"
-#include "../utils/TimeStamp.hpp"
 #include "../utils/Logging.hpp"
 #include "SocketsOps.hpp"
 #include <sys/eventfd.h>
+#include "TimerCallbackQueue.hpp"
 
 namespace
 {
@@ -20,7 +20,8 @@ EventLoop::EventLoop():
   poller_(PollerBase::newDefaultPoller(this)),
   quit_(false),
   wakeupFd_(createEventfd()),
-  wakeupChannel_(new Channel(this, wakeupFd_))
+  wakeupChannel_(new Channel(this, wakeupFd_)),
+  timerQueue_(new TimerCallbackQueue(this))
 {
    if (t_loopInThisThread != nullptr)
    {
@@ -140,6 +141,10 @@ int EventLoop::createEventfd()
     return efd;
 }
 
-
+void EventLoop::registerTimerCallback(TimerCallback* cb)
+{
+    LOG_INFO <<"TimerCallback = "<< static_cast<const void*>(cb);
+    this->runInLoop(std::bind(&TimerCallbackQueue::addTimerCb, timerQueue_.get(), cb));
+}
 
 }

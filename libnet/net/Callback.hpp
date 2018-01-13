@@ -23,6 +23,7 @@ namespace  net
     using SendCompleteCallback = std::function<void (const TcpConnectionPtr&)>;//be called when all user data are writen to sockfd
     using CloseCallback = std::function<void (const TcpConnectionPtr&)>; //be called on close tcp connection
     using HighWaterMarkCallback = std::function<void (const TcpConnectionPtr&, size_t)> ;
+    using TimerCallbackFunc = std::function<void ()>;
 }
 
 #endif //MULTITHREAD_CALLBACK_HPP

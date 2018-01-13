@@ -51,12 +51,15 @@ set(SOURCE_FILES
 
         libnet/libnet.mk  #to build libnet.a
 
-
-        libnet/test/TestEchoServer.cpp
+        libnet/test/TestEchoClient.cpp
+        #libnet/test/TestEchoServer.cpp
 
         makefile  #to build testcase
         README.md
         readme.txt
-        )
+        libnet/net/TimerCallback.cpp
+        libnet/net/TimerCallback.hpp
+        libnet/net/TimerCallbackQueue.cpp
+        libnet/net/TimerCallbackQueue.hpp)
 
 add_executable(multiThread ${SOURCE_FILES})
