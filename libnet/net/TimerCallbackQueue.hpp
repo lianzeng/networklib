@@ -28,7 +28,7 @@ public:
     //void removeTimerCb(TimerId);
 
 private:
-    void handleTimeout(TimeStamp);
+    void handleTimeout(TimeStamp);//be called every 1ms or 2ms ,system precision ?
     std::vector<Entry> getExpired(TimeStamp now);
     bool insert(TimerCallback*);
     void reset(const std::vector<Entry>& expired, TimeStamp now);//restart or remove expired timers;

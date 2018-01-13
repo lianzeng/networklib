@@ -40,8 +40,9 @@ namespace net
           resetTimerfd(timerfd_, cb->expiration());
     }
 
-    void TimerCallbackQueue::handleTimeout(TimeStamp now) {
-        LOG_INFO <<"timerfd = "<< timerfd_;
+    void TimerCallbackQueue::handleTimeout(TimeStamp) {
+        auto now = TimeStamp::now();
+        LOG_INFO <<"timerfd = "<< timerfd_ <<", now = "<< now.toString();
         loop_->assertInOwnerThread();
         readTimerfd(timerfd_);
         auto expiredTimers = getExpired(now);
@@ -58,7 +59,7 @@ namespace net
         assert(iter == timers_.end() || now < iter->first);
         std::copy(timers_.begin(),iter, back_inserter(result));
         timers_.erase(timers_.begin(), iter);
-        LOG_DBG <<"expired timerNum = "<< result.size() <<", leftNum = "<<timers_.size();
+        LOG_INFO <<"expired timerNum = "<< result.size() <<", leftNum = "<<timers_.size();
         return result;
     }
 
@@ -91,13 +92,13 @@ namespace net
             if(nextExpire.valid())
                 resetTimerfd(timerfd_, nextExpire);
         }
-        LOG_DBG <<"total timersNum = "<<timers_.size();
+        LOG_INFO <<"total timersNum = "<<timers_.size();
     }
 
 
 
     void TimerCallbackQueue::resetTimerfd(const int timefd, TimeStamp expiration) {
-        LOG_INFO <<"timefd = " <<timefd;
+        LOG_INFO <<"timefd = " <<timefd <<", expiration = "<< expiration.toString();
         struct itimerspec newValue;
         struct itimerspec oldValue;
         memset(&newValue, 0, sizeof(newValue));
@@ -117,7 +118,7 @@ namespace net
     void TimerCallbackQueue::readTimerfd(const int timefd) {
         uint64_t dummy;
         auto n = ::read(timefd, &dummy, sizeof(dummy));
-        LOG_TRACE <<"timefd = " << timefd;
+        LOG_INFO <<"timefd = " << timefd;
         if(n != sizeof(dummy))
             LOG_ERROR <<"read "<< n <<" bytes, expect = "<< sizeof(uint64_t);
     }

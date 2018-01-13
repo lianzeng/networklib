@@ -7,6 +7,7 @@
 #include <ctime>
 #include <cstdio>
 #include <cassert>
+#include <cinttypes>
 
 /// Time stamp in UTC, in microseconds resolution.
 class TimeStamp
@@ -68,6 +69,14 @@ void formatMs(char (&timeMs)[32])const
     assert(length == 9);
 }
 
+std::string toString()const
+{
+    char buff[32] = {0};
+    auto sec_us = get();
+    snprintf(buff, sizeof(buff)-1, "%" PRId64 ".%06" PRId64 "",sec_us.first,  sec_us.second);
+    return buff;
+}
+
 TimeStamp operator+(double seconds) const
 {
     return TimeStamp(microSeconds + static_cast<int64_t >(seconds * MicroSecondsPerSecond) );
@@ -77,7 +86,7 @@ TimeStamp operator+(double seconds) const
 TimeStamp(const TimeStamp&) = default;
 TimeStamp& operator=(const TimeStamp&) = default;
 
-static const int MicroSecondsPerSecond = 1000 * 1000;
+static const int MicroSecondsPerSecond = 1000 * 1000;//us
 
 private:
 int64_t microSeconds;

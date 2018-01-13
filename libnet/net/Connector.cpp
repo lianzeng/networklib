@@ -38,6 +38,8 @@ void Connector::connect()
   int sockfd = sockets::createNonblocking(serverAddr_.family());
   int ret = sockets::connect(sockfd, serverAddr_.getSockAddr());
   int savedErrno = (ret == 0) ? 0 : errno;//errno definition: http://www-numi.fnal.gov/offline_software/srt_public_context/WebDocs/Errors/unix_system_errors.html
+
+  LOG_INFO<<"sockfd = "<<sockfd <<", savedErrno = "<<savedErrno;
   switch (savedErrno)
   {
     case 0:
@@ -134,14 +136,14 @@ void Connector::removeAndFreeChannel()
 
 void Connector::retry(int sockfd)
 {
-  const int retry_period = 3;//3seconds
-  LOG_INFO <<" close fd =  "<<channel_->fd() <<", retry after "<< retry_period <<"s.";
+  const int retry_delay = 5;//5seconds
+  LOG_INFO <<" close fd =  "<<channel_->fd() <<", retry after "<< retry_delay <<"s.";
 
   sockets::close(channel_->fd());
   setState(States::Disconnected);
 
-  auto when = TimeStamp::now() + retry_period;
-  auto timerCb = new TimerCallback(std::bind(&Connector::startInloop, shared_from_this()), when, retry_period);
+  auto when = TimeStamp::now() + retry_delay;
+  auto timerCb = new TimerCallback(std::bind(&Connector::startInloop, shared_from_this()), when, 0.0);
   loop_->registerTimerCallback(timerCb);
 }
 

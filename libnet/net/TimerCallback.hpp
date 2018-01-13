@@ -13,7 +13,7 @@ namespace  net
 class TimerCallback
 {
 public:
-    TimerCallback(TimerCallbackFunc&& cb, TimeStamp when, double interval);//interval(unit=seconds)
+    TimerCallback(TimerCallbackFunc&& cb, TimeStamp when, double interval);
     ~TimerCallback() = default;
 
     void run() const
@@ -32,7 +32,7 @@ private:
 
 const TimerCallbackFunc  callback;
 TimeStamp expiration_;
-const double interval_;
+const double interval_;//unit=seconds
 const bool repeatable;
 
 
