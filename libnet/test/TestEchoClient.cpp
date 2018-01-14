@@ -39,8 +39,19 @@ private:
   void onMessage(const TcpConnectionPtr& conn, Buffer* buffer, TimeStamp)
   {
     LOG_TRACE <<"EchoClient receive message: "<< buffer->retrieveAll();
-    conn->send("world!\n");
+    static std::string content[] = {"hello","Daddy","Love","you!\n"};
+    static int index = 0;
+    if(index < elementsOf(content))
+      conn->send(std::move(content[index++]));
+    else
+      conn->shutDown();
   }
+
+  template<typename  T, size_t N>
+  size_t elementsOf(const T (&array)[N])
+  {
+    return sizeof(array)/sizeof(array[0]);
+  };
 
   EchoClient(const EchoClient&) = delete;
   EchoClient& operator=(const EchoClient&) = delete;

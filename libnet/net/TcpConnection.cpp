@@ -71,13 +71,19 @@ void TcpConnection::connectEstablished() {
 }
 
 void TcpConnection::handleRead(TimeStamp receiveTime) {
-    LOG_INFO <<"TcpConnection::handleRead: fd = " << channelPtr->fd();
+
     loop_->assertInOwnerThread();
     auto readBytes = receivedBuffer.receive();
     if(readBytes > 0)
+    {
+        LOG_INFO <<"readBytes = "<< readBytes <<", from fd = "<< channelPtr->fd();
         messageCallback_(shared_from_this(), &receivedBuffer, receiveTime);
+    }
     else if(readBytes == 0) //peer close
+    {
+        LOG_INFO <<"peer shutdown write, fd = "<< channelPtr->fd();
         handleClose();
+    }
     else
         handleError();
 }
@@ -126,8 +132,19 @@ bool TcpConnection::sendingQueueEmpty() const {
 
 void TcpConnection::shutDownInLoop() {
     LOG_INFO <<"TcpConnection::shutDownInLoop: fd = " << channelPtr->fd();
-    if(!channelPtr->isWriting())
+    loop_->assertInOwnerThread();
+
+    if(!channelPtr->isWriting()) //else: shutdownWrite after sendBuffer clear;
         socketPtr->shutdownWrite();
+}
+
+void TcpConnection::shutDown() {
+    LOG_INFO <<"stop send data to peer, but still in receive";
+    if(states_ == States::Connected)
+    {
+        setState(States::Disconnecting);
+        loop_->runInLoop(std::bind(&TcpConnection::shutDownInLoop, this));
+    }
 
 }
 

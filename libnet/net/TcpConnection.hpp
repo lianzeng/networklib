@@ -46,6 +46,7 @@ void setSendCompleteCallback(const SendCompleteCallback& cb){sendCompleteCallbac
 void setCloseCallback(const CloseCallback& cb){ closeCallback_ = cb;}
 
 EventLoop* ownerLoop(){return loop_;}
+void shutDown();//shut down write
 
 private:
 enum States{Disconnected, Connecting, Connected, Disconnecting};

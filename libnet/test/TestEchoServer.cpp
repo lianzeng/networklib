@@ -34,14 +34,14 @@ public:
 private:
     void onConnection(const TcpConnectionPtr& conn)
     {
-        LOG_INFO<<"EchoServer connected ! ";
+        LOG_INFO<<"EchoServer connected to a new client!";
         conn->send("Nice !");
     }
 
     void onMessage(const TcpConnectionPtr& conn, Buffer* buffer, TimeStamp)
     {
         LOG_TRACE <<"EchoServer receive message: "<< buffer->retrieveAll();
-        conn->send("Bye !");
+        conn->send(buffer->retrieveAll());
     }
 
     TcpServer tcpServer;
