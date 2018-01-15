@@ -19,7 +19,7 @@ linux multi thread programming in C++11, refer to muduo, which use boost.
 
 
 # This project is build on following environment:
-  Linux VBox 3.19.0-15-generic #15-Ubuntu SMP Thu Apr 16 23:32:37 UTC 2015 x86_64 x86_64 x86_64 GNU/Linux; Ubuntu 15.04;
+  Linux VBox 3.19.0-15-generic #15-Ubuntu SMP  2015 x86_64 x86_64 x86_64 GNU/Linux; Ubuntu 15.04; GCC 4.9.2
   
 # Develop Tool used: 
   Linux Tool(Git + Clion_Linux_Version_2017_2_1) + Windows Tool (SecureCRT6.7.1_X64 + XMing6.9.0.31 + VirtualBox_4.3.30)
