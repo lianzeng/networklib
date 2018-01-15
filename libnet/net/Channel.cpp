@@ -15,7 +15,7 @@ Channel::Channel(EventLoop* loop, int _fd):
   fd_(_fd),
   events_(0),
   revents_(0),
-  index_(-1)
+  index_(-1)//-1 = EPoller::Status::New
 {
 }
 

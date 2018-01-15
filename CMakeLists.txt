@@ -60,6 +60,8 @@ set(SOURCE_FILES
         libnet/net/TimerCallback.cpp
         libnet/net/TimerCallback.hpp
         libnet/net/TimerCallbackQueue.cpp
-        libnet/net/TimerCallbackQueue.hpp)
+        libnet/net/TimerCallbackQueue.hpp
+        libnet/net/EPoller.cpp
+        libnet/net/EPoller.hpp)
 
 add_executable(multiThread ${SOURCE_FILES})
