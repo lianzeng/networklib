@@ -19,7 +19,7 @@ public:
     EventLoopThread();
     ~EventLoopThread();
 
-    EventLoop* loop() {return loop_;}
+    EventLoop* getLoop() {return loop_;}
 
 private:
     void threadMain();

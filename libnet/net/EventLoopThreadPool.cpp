@@ -23,7 +23,7 @@ namespace  net
         else
         {
             LOG_INFO<<" round-robin to thread_index: " << nextThreadToBeSelect ;
-            auto ioloop = threadPool_[nextThreadToBeSelect]->loop();
+            auto ioloop = threadPool_[nextThreadToBeSelect]->getLoop();
             nextThreadToBeSelect = (nextThreadToBeSelect + 1) % threadPool_.size();
             return ioloop;
         }

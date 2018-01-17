@@ -13,9 +13,9 @@ namespace net
     EventLoopThread::EventLoopThread():
     loop_(nullptr),
     countDownLatch_(1),
-    thread_(std::bind(&EventLoopThread::threadMain, this))
+    thread_(std::bind(&EventLoopThread::threadMain, this))//create a new thread
     {
-        countDownLatch_.wait();
+        countDownLatch_.wait();//wait new thread run
 
         if(loop_ == nullptr)
             LOG_FATAL <<"new thread not start, cause EventLoop is nullptr.";
