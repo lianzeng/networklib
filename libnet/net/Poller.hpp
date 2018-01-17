@@ -21,7 +21,7 @@ virtual ~Poller();
 
 
 private:
-void fillActiveChannels(int numEvents , ChannelList& activeChannels) const;
+void fillActiveChannels(int numEvents , ChannelList& activeChannels) const override ;
 void addNewChannel(Channel* channel);
 void updateExistChannel(Channel* channel);
 

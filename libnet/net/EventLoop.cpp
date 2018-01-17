@@ -16,7 +16,7 @@ namespace net
 {
 
 EventLoop::EventLoop():
-  threadId_(currentThread::tid()),
+  ownerThreadId_(currentThread::tid()),
   poller_(PollerBase::newDefaultPoller(this)),
   quit_(false),
   wakeupFd_(createEventfd()),
@@ -115,7 +115,7 @@ void EventLoop::removeChannel(Channel* cn)
 void EventLoop::assertInOwnerThread()
 {
   if(!inOwnerThread())
-    LOG_FATAL << "EventLoop is created by threadid = " << threadId_ << " ,but current running id = " << currentThread::tid();
+    LOG_FATAL << "EventLoop is created by threadid = " << ownerThreadId_ << " ,but current running id = " << currentThread::tid();
 }
 
 void EventLoop::wakeUp()

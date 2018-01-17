@@ -12,7 +12,7 @@ namespace net
 namespace sockets
 {
 
-int createNonblocking(sa_family_t family)
+int createNonblockingSockfd(sa_family_t family)
 {
   int sockfd = ::socket(family, SOCK_STREAM | SOCK_NONBLOCK | SOCK_CLOEXEC, IPPROTO_TCP);
   if (sockfd < 0)

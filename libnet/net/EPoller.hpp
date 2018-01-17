@@ -27,7 +27,7 @@ public:
 
 
 private:
-    void fillActiveChannels(int numEvents , ChannelList& activeChannels) const;
+    void fillActiveChannels(int numEvents , ChannelList& activeChannels) const override ;
     void expandEventContainerIfTight(size_t actualEventNum);
     void syncToEpoll(int operation, Channel* channel);
     std::string operationToString(int op)const;

@@ -35,7 +35,7 @@ void Connector::startInloop()
 
 void Connector::connect()
 {
-  int sockfd = sockets::createNonblocking(serverAddr_.family());
+  int sockfd = sockets::createNonblockingSockfd(serverAddr_.family());
   int ret = sockets::connect(sockfd, serverAddr_.getSockAddr());
   int savedErrno = (ret == 0) ? 0 : errno;//errno definition: http://www-numi.fnal.gov/offline_software/srt_public_context/WebDocs/Errors/unix_system_errors.html
 

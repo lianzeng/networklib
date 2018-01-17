@@ -51,8 +51,8 @@ set(SOURCE_FILES
 
         libnet/libnet.mk  #to build libnet.a
 
-        libnet/test/TestEchoClient.cpp
-        #libnet/test/TestEchoServer.cpp
+        #libnet/test/TestEchoClient.cpp
+        libnet/test/TestEchoServer.cpp
 
         makefile  #to build testcase
         README.md

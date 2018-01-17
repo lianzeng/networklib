@@ -39,7 +39,7 @@ private:
     Acceptor&operator=(const Acceptor&) = delete;
 
 EventLoop* loop_;
-Socket  acceptSocket_;
+Socket  listenSocket_;
 Channel acceptChannel;
 NewConnectionCallback newConnectionCallback_;
 

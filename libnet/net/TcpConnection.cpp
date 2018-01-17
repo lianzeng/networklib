@@ -17,7 +17,7 @@ TcpConnection::TcpConnection(EventLoop *loop, int sockfd):
 
 {
   using namespace std::placeholders;
-  channelPtr->setReadCallback(std::bind(&TcpConnection::handleRead, this, _1));
+  channelPtr->setReadCallback(std::bind(&TcpConnection::receive, this, _1));
   channelPtr->setWriteCallback(std::bind(&TcpConnection::handleWrite, this));
   channelPtr->setCloseCallback(std::bind(&TcpConnection::handleClose, this));
   channelPtr->setErrorCallback(std::bind(&TcpConnection::handleError, this));
@@ -70,7 +70,7 @@ void TcpConnection::connectEstablished() {
 
 }
 
-void TcpConnection::handleRead(TimeStamp receiveTime) {
+void TcpConnection::receive(TimeStamp receiveTime) {
 
     loop_->assertInOwnerThread();
     auto readBytes = receivedBuffer.receive();
@@ -79,7 +79,7 @@ void TcpConnection::handleRead(TimeStamp receiveTime) {
         LOG_INFO <<"readBytes = "<< readBytes <<", from fd = "<< channelPtr->fd();
         messageCallback_(shared_from_this(), &receivedBuffer, receiveTime);
     }
-    else if(readBytes == 0) //peer close
+    else if(readBytes == 0) //peer shutdown write 
     {
         LOG_INFO <<"peer shutdown write, fd = "<< channelPtr->fd();
         handleClose();

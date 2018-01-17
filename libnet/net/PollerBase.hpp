@@ -35,6 +35,8 @@ virtual ~PollerBase();
       ownerLoop_->assertInOwnerThread();
   }
 
+private:
+    virtual void fillActiveChannels(int numEvents , ChannelList& activeChannels) const = 0;
 
 PollerBase(const PollerBase&) = delete;
 PollerBase& operator=(const PollerBase&) = delete;

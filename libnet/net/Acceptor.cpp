@@ -11,15 +11,15 @@ using namespace net;
 
 Acceptor::Acceptor(EventLoop *loop, const InetAddress &listenAddr, bool reusePort):
   loop_(loop),
-  acceptSocket_(sockets::createNonblocking(listenAddr.family())),
-  acceptChannel(loop, acceptSocket_.fd()),
+  listenSocket_(sockets::createNonblockingSockfd(listenAddr.family())),
+  acceptChannel(loop, listenSocket_.fd()),
   idleFd_(::open("/dev/null", O_RDONLY | O_CLOEXEC))
 {
     using namespace std::placeholders;
     assert(idleFd_ >= 0);
-    acceptSocket_.enableReuseAddr();
-    acceptSocket_.setReusePort(reusePort);
-    acceptSocket_.bindAddress(listenAddr);
+    listenSocket_.enableReuseAddr();
+    listenSocket_.setReusePort(reusePort);
+    listenSocket_.bindAddress(listenAddr);
     acceptChannel.setReadCallback(std::bind(&Acceptor::handRead, this, _1));
 }
 
@@ -29,14 +29,14 @@ void Acceptor::listen()
 {
     LOG_INFO <<"Acceptor::listen";
     loop_->assertInOwnerThread();
-    acceptSocket_.listen();
+    listenSocket_.listen();
     acceptChannel.enableReading();
 }
 
 void Acceptor::handRead(TimeStamp)
 {
     loop_->assertInOwnerThread();
-    auto result = acceptSocket_.accept();
+    auto result = listenSocket_.accept();
     if(result.first >= 0)
     {
       if(newConnectionCallback_)
@@ -52,7 +52,7 @@ void Acceptor::handRead(TimeStamp)
       if(errno == EMFILE) //these code refer to libevent
       {
           ::close(idleFd_);
-          idleFd_ = ::accept(acceptSocket_.fd(), NULL, NULL);
+          idleFd_ = ::accept(listenSocket_.fd(), NULL, NULL);
           ::close(idleFd_);
           idleFd_ = ::open("/dev/null", O_RDONLY | O_CLOEXEC);
       }

@@ -30,9 +30,8 @@ TcpConnection(EventLoop* loop, int sockfd);
 ~TcpConnection();
 
 void send(std::string&& msg);
+void receive(TimeStamp);
 
-
-void handleRead(TimeStamp);
 void handleWrite();
 void handleClose();
 void handleError();

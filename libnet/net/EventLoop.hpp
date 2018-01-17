@@ -56,7 +56,7 @@ static int createEventfd();
 
 bool inOwnerThread() const
 {
-  return threadId_ == currentThread::tid();
+  return ownerThreadId_ == currentThread::tid();
 }
 
 EventLoop(const EventLoop&) = delete;
@@ -64,7 +64,7 @@ EventLoop& operator=(const EventLoop&) = delete;
 
 
 private:
- const pid_t threadId_;//indicate  owner thread
+ const pid_t ownerThreadId_;//indicate  owner thread
  
  std::mutex mutex_;
  std::vector<Functor> pendingFunctors_;//guarded by mutex_, because accessed by multi-threads;
