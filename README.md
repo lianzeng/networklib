@@ -1,6 +1,6 @@
 # multiThread network library on linux platform Using C++11
 
-linux multi thread programming in C++11, refer to muduo, which use boost.
+linux multi thread programming in C++11.
 
 1)IO multiplexing: poll, epoll;
 
