@@ -1,0 +1,165 @@
+
+@startuml
+
+class TcpServer{
+-EventLoop* baseloop;
+-Acceptor*;
+-EventLoopThreadPool*;
+-vector<TcpConnectionPtr>;
++void start();
++void setThreadNum(int);
++void setMessageCallback(cb);
++void newConnection(fd);
+}
+
+class Acceptor{
++void listen();
+-void handRead();
+-Channel acceptChannel;
+-NewConnectionCb cb;
+}
+
+class EventLoopThread{
++EventLoop* getloop()
+-void threadMain()
+-EventLoop*
+std::thread thread_
+-CountDownLatch cdl
+}
+
+class EventLoopThreadPool{
++EventLoop* getNextLoop()
++void buildThreadPool()
+-vector<EventLoopThread> pool
+-int nextloop
+-EventLoop* baseloop
+}
+
+class EventLoop{
++void loop();
++void runInLoop(functor);
++void assertInOwnerThread();
++void registerTimerCb(timerCb);
+-void doPendingFunctors();
+PollerBase*;
+TimerCbQueue que;
+int wakeupfd;
+vector<functor> pendingtask;
+}
+
+
+class Channel{
++void handleEvent();
++void enableReading();
++void enableWriting();
++void setXXXCallback();
+-Eventloop*; 
+int fd;
+EventCallback xxcb;
+}
+
+
+class PollerBase{
++ChannelList poll(int timeout) = 0;
++void updateChannel(Channel*) = 0;
++void removeChannel(Channel*) = 0;
+-void fillActiveChannels() = 0;
+-Eventloop* ownerloop_;
+}
+
+class Poller{
+-void addNewChannel(Channel*);
+-void updateExistChannel(Channel*);
+-vector<struct pollfd> fdlist;
+}
+
+class EPoller{
+-void syncToEpoll();
+-int epollfd;
+-vector<struct epoll_event> revents;
+}
+
+
+class TcpConnection{
++void send(msg);
++void receive();
++void handleWrite();
++void handleClose();
++void handleError();
+-Eventloop*;
+-Channel*;
+-Socket*;
+-SendBuffer;
+-ReceiveBuffer;
+}
+
+class Buffer{
++void append(msg)
++string retrieveAll()
+}
+
+class SendBuffer{
++ send()
++ send(msg)
+-int fd
+-int highWaterMark
+}
+
+class ReceiveBuffer{
++void receive()
+-int fd
+}
+
+class TimerQueue{
++void addTimerCb()
+-void handTimeOut()
+-Timers getExpired()
+-void reset(expiredTimers)
+-int timerfd
+-std::set<pair<Timestamp, Cb>>timers
+}
+
+class TimerCallback{
++void run()
++bool repeat()
++void restart()
+-Callbackfun
+int period
+}
+
+class Connector{
++void start()
+-void connect()
+-void retry()
+-void handleWrite()
+-EventLoop*
+-Channel
+}
+
+class TcpClient{
++void connect()
++void setXXXCallback()
+-EventLoop*
+-Connector
+-TcpConnectionPtr
+}
+
+
+TcpServer "1" *-- "1" EventLoopThreadPool
+TcpServer "1" *-- "1" Acceptor
+EventLoopThreadPool "1" *-- "N" EventLoopThread
+EventLoopThread "1" *-- "1" EventLoop
+EventLoop "1" *-- "1" PollerBase
+EventLoop "1" *-- "1" TimerQueue
+TimerQueue "1" *-- "N" TimerCallback
+PollerBase "1" *-- "N" Channel
+Channel  "1" *-- "1" TcpConnection
+TcpConnection "1" *-- "1" SendBuffer
+TcpConnection "1" *-- "1" ReceiveBuffer
+TcpClient "1" *-- "1" Connector
+PollerBase <|-- EPoller
+PollerBase <|-- Poller
+Buffer <|-- SendBuffer
+Buffer <|-- ReceiveBuffer
+
+@enduml
