@@ -1,0 +1,43 @@
+20180316 09:34:43.658063   2658 INFO  addNewChannel   fd = 4 events = POLLIN POLLPRI  - Poller.cpp:88
+20180316 09:34:43.658221   2658 INFO  addNewChannel   fd = 3 events = POLLIN POLLPRI  - Poller.cpp:88
+20180316 09:34:43.658248   2658 INFO  connect  TcpClient start connect  - TcpClient.cpp:25
+20180316 09:34:43.658688   2658 INFO  connect sockfd = 5, savedErrno = 115 - Connector.cpp:42
+20180316 09:34:43.658704   2658 INFO  connecting  fd = 5 - Connector.cpp:81
+20180316 09:34:43.658732   2658 INFO  addNewChannel   fd = 5 events = POLLOUT  - Poller.cpp:88
+20180316 09:34:43.658739   2658 INFO  loop EventLoop 0x7fff1a241a90 start looping - EventLoop.cpp:45
+20180316 09:34:43.658751   2658 INFO  poll  poll() : 1 events happend ! - Poller.cpp:34
+20180316 09:34:43.658759   2658 INFO  handleEvent fd = 5 , revents = POLLOUT  - Channel.cpp:30
+20180316 09:34:43.658764   2658 INFO  handleWrite fd = 5 , state =  1 - Connector.cpp:94
+20180316 09:34:43.658770   2658 INFO  updateExistChannel  fd = 5 events = 0 - Poller.cpp:93
+20180316 09:34:43.658779   2658 INFO  removeChannel   fd = 5 - EventLoop.cpp:110
+20180316 09:34:43.658798   2658 INFO  newConnection TcpClient connect to server succesfully. - TcpClient.cpp:31
+20180316 09:34:43.658808   2658 INFO  connectEstablished TcpConnection::connectEstablished: fd = 5 - TcpConnection.cpp:65
+20180316 09:34:43.658818   2658 INFO  addNewChannel   fd = 5 events = POLLIN POLLPRI  - Poller.cpp:88
+20180316 09:34:43.658824   2658 INFO  onConnection EchoClient connected !  - TestEchoClient.cpp:35
+20180316 09:34:43.659048   2658 INFO  doPendingFunctors   PendingFunctors num = 1 - EventLoop.cpp:67
+20180316 09:34:43.659068   2658 INFO  poll  poll() : 1 events happend ! - Poller.cpp:34
+20180316 09:34:43.659082   2658 INFO  handleEvent fd = 5 , revents = POLLIN  - Channel.cpp:30
+20180316 09:34:43.659096   2658 INFO  receive readBytes = 13, from fd = 5 - TcpConnection.cpp:79
+20180316 09:34:43.659226   2658 INFO  doPendingFunctors   PendingFunctors num = 0 - EventLoop.cpp:67
+20180316 09:34:43.659240   2658 INFO  poll  poll() : 1 events happend ! - Poller.cpp:34
+20180316 09:34:43.659252   2658 INFO  handleEvent fd = 5 , revents = POLLIN  - Channel.cpp:30
+20180316 09:34:43.659260   2658 INFO  receive readBytes = 5, from fd = 5 - TcpConnection.cpp:79
+20180316 09:34:43.659360   2658 INFO  doPendingFunctors   PendingFunctors num = 0 - EventLoop.cpp:67
+20180316 09:34:43.659373   2658 INFO  poll  poll() : 1 events happend ! - Poller.cpp:34
+20180316 09:34:43.659384   2658 INFO  handleEvent fd = 5 , revents = POLLIN  - Channel.cpp:30
+20180316 09:34:43.659391   2658 INFO  receive readBytes = 5, from fd = 5 - TcpConnection.cpp:79
+20180316 09:34:43.659602   2658 INFO  doPendingFunctors   PendingFunctors num = 0 - EventLoop.cpp:67
+20180316 09:34:43.659615   2658 INFO  poll  poll() : 1 events happend ! - Poller.cpp:34
+20180316 09:34:43.659626   2658 INFO  handleEvent fd = 5 , revents = POLLIN  - Channel.cpp:30
+20180316 09:34:43.659635   2658 INFO  receive readBytes = 4, from fd = 5 - TcpConnection.cpp:79
+20180316 09:34:43.659732   2658 INFO  doPendingFunctors   PendingFunctors num = 0 - EventLoop.cpp:67
+20180316 09:34:43.659743   2658 INFO  poll  poll() : 1 events happend ! - Poller.cpp:34
+20180316 09:34:43.659754   2658 INFO  handleEvent fd = 5 , revents = POLLIN  - Channel.cpp:30
+20180316 09:34:43.659762   2658 INFO  receive readBytes = 5, from fd = 5 - TcpConnection.cpp:79
+20180316 09:34:43.659770   2658 INFO  shutDown stop send data to peer, but still in receive - TcpConnection.cpp:142
+20180316 09:34:43.659775   2658 INFO  shutDownInLoop TcpConnection::shutDownInLoop: fd = 5 - TcpConnection.cpp:134
+20180316 09:34:43.668095   2658 INFO  doPendingFunctors   PendingFunctors num = 0 - EventLoop.cpp:67
+20180316 09:34:43.668119   2658 INFO  poll  poll() : 1 events happend ! - Poller.cpp:34
+20180316 09:34:43.668138   2658 INFO  handleEvent fd = 5 , revents = POLLIN POLLHUP  - Channel.cpp:30
+20180316 09:34:43.668151   2658 INFO  receive peer shutdown write, fd = 5 - TcpConnection.cpp:84
+20180316 09:34:43.668154   2658 INFO  ha
