@@ -1,0 +1,29 @@
+@startuml
+hide footbox
+title TcpServer Start Flow
+
+participant User
+participant TcpServer
+participant Acceptor
+participant EventLoopThreadPool
+participant EventLoopThread
+participant EventLoop
+
+
+User -->TcpServer:set port
+User -> TcpServer: start()
+TcpServer ->EventLoopThreadPool: createPool()
+
+loop N Threads
+EventLoopThreadPool -> EventLoopThread:new thread,wait run
+note right:block until new thread run
+EventLoopThread->EventLoopThread:std::thread
+
+EventLoopThread->EventLoop:create loop instance
+end
+
+TcpServer->Acceptor:listen()
+
+
+
+@enduml

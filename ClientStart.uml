@@ -1,0 +1,44 @@
+@startuml
+hide footbox
+title TcpClient Start Flow
+
+participant User
+participant TcpClient
+participant Connector
+participant Channel
+participant EventLoop
+participant Poller
+participant TcpConnection
+
+User-->EventLoop:new Eventloop instance
+User-->TcpClient:new client(server_ip_Port)
+note right:setCallback
+User->TcpClient:connect()
+TcpClient->Connector:connect():
+note right:new connectFd
+
+Connector->Channel:new channel(connectFd)
+note right:setCallback
+Connector->Channel:enableWriting
+Channel ->EventLoop:updateChannel()
+EventLoop->Poller:updateChannel()
+note right:add new sockfd
+
+User->EventLoop:loop()
+EventLoop->Poller:poll(): monitor IO Events
+Poller-->EventLoop:ActiveChannels
+note left:accepted by server
+
+EventLoop->Channel:handleEvent
+note right:dispatchEventToCallback
+Channel->Connector:handleWrite()
+Connector->TcpClient:newConnection()
+TcpClient-->TcpConnection:new a TcpConnection
+TcpClient->TcpConnection:connectEstablished()
+TcpConnection->Channel:enableReading()
+note left:add fd to Poller
+
+
+
+
+@enduml
