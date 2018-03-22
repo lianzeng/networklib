@@ -1,0 +1,231 @@
+This Project is a open source multi-thread C++ network library based on the reactor pattern, It runs on Linux with kernel version >= 2.6.28.
+
+这个网络库比较难的地方还是在对象的生命周期管理：什么时候传递this, shared_from_this, shared_ptr .
+
+
+
+C++程序与C语言函数库交互的一个难点在于资源管理；
+用C++来设计主要是用类的封装性，而不是继承，因为不是在写框架，在应用程序中用复杂的继承没好处，谨慎使用继承；
+回调：用户实现回调函数，比如打印参数内容，框架来调用它，提供信息（实参），回调函数的实参由2个地方提供：调用方 和 bind(),  因为function对象具有保存数据的功能；
+
+
+C++编程中最重要的技法：用对象来管理资源(RAII): store newed object to smart pointer ! 用RAII时，构造和析构函数里的实现是对称的，比如构造申请资源，析构销毁资源；MutexLockGuard就是RAII手法实现的；
+资源包括内存，文件，TCP连接socketfd，数据库连接，互斥锁，借助RAII,可以把资源管理和对象生命期管理等同起来。
+多线程时不应该直接操作socketfd,应该用socket对象封装fd,只在socket对象析构函数里面去close(fd)，用shared_ptr管理socket对象。
+对象生命期管理用smart pointer(shared_ptr,weak_ptr),不再使用delete,不必为内存担心；
+C++的确定性析构（一个对象在离开作用域的时候会保证调用析构函数，包括异常）经常用于临界区加解锁，eg: { MutexLockGuard lock(mutex_); xxxx } 这里的{}就是作用域；
+
+Fork(): 如果程序中使用了fork()，即使用RAII管理对象，也可能会导致对象多次被析构，所以要慎重考虑是否要做程序中使用fork();
+        使用fork产生的子进程会共享父进程的fd,但是不会共享父进程的内存锁(mlock)，文件锁(fcntl)，某些定时器；
+        fork()一般不能在多线程程序中调用，因为fork()只克隆当前线程，不克隆其它线程，fork()出来的子进程只有1个线程，其它线程都消失了（这个非常危险），
+        所以唯一安全的做法是在fork()之后立马调用exec()执行另一个程序，彻底隔断与原来进程的联系；
+
+C++多线程编程面临的最基本问题是避免对象析构时出现race condition,对象的生死不能由对象自身拥有的mutex保护，
+幸好借助Boost库中的shared_ptr/weak_ptr可以完美解决C++多线程编程中对象析构时的race condition问题；
+使用smart pointer来管理资源时为避免循环引用导致的资源泄露：可以让owner持有一个 shared_ptr 指向child,让child持有 weak_ptr 指向owner;
+share_ptr本身不是100%线程安全的，但是可以保证其管理的对象做到线程安全的释放，如何做到的？
+如果多个线程操作同一个share_ptr对象，那需要用mutex保护，一般情况下是操作不同的share_ptr对象（指向的资源可能相同）；
+
+IOMultiplex:多路复用：是指多个Socket连接复用1个线程；
+
+同步的本质是：将并行操作串行化；
+同步异步是多线程之间的协作方式，阻塞非阻塞是单线程读取IO的说法；
+异步：被调用者会主动通知调用者，一般涉及函数回调；
+同步异步的本质区别是：主动还是被动知道结果，如果是主动查询就是同步，如果是被动通知就是异步；
+非阻塞和异步比较:相同点：调用函数后都可以立即返回，
+             不同点： 非阻塞需要调用者主动去询问结果；而异步则是被动通知调用结果；
+             结论： 异步更能节省CPU，而非阻塞需要消耗CPU来做轮询；
+
+线程安全是不可组合的，一个函数调用了2个线程安全的函数，但这个函数不一定是线程安全的；
+一个线程安全的class是指该类的实例被多线程共享时，调用端代码无需额外的同步也很安全。
+C++标准库的大多数class都不是线程安全的，比如string/vector/map，因为这些class通常需要外部加锁才能允许多个线程同时访问。
+
+可靠性： 数据不丢失，要求持久化，比如异地多活；
+可用性： 服务中断的时间，高可用一般通过集群，避免单点故障；
+
+文件描述符(fd):0--stdin, 1---stdout,2---stderr, 3..other;因为fd是个整数，而且posix标准规定在创建新文件的时候必须用可用的最小编号，
+ 所以在高并发连接中，如果直接用原始的fd来表示socket很容易串话，在C++中用RAII封装fd，可以避免串话（sharePtr管理socket，用对象地址区分不同socket connection）；
+
+C++多线程编程模型：1)oneLoopPerThread(IO loop):配合non-bolcking IO(poll/epoll)+定时器; 2)thread pool:用于计算，可以是taskqueue/ConsumerProducerQueue;3)Reactor模式(callback)
+每个IO线程最多1个EventLoop对象;
+推荐的多线程服务端编程模式（169页方案8和9）：
+模式一：1个accept线程负责dispatch新连接到线程池，线程池采用Reactor模式，每个线程有一个eventloop,负责该线程的sockets IO(IO Multiplexing, timer, non-block io), event事件在所属线程通过回调函数处理（用户提供非阻塞的回调函数）；
+模式二：1个IO线程负责所有连接的IO事件收集，然后通过taskqueue/msgqueue传递给thread pool 处理(producer-consumer, condition_variable);  
+这两种模式的区别：模式一把IO分配到了多个线程，而且每个线程即是IO线程又是计算线程，线程之间不需要通信；模式二把IO集中到了单个线程，模式二的线程池只做计算，不做IO，IO线程和线程池的关系是生产者-消费者，使用条件变量通信；
+
+通过系统调用创建文件描述符fd时有2个重要的flag参数：NONBLOCK, FD_CLOEXEC;
+
+BlockingQueue<T>: 多线程编程利器,可用于构造“任务队列”和“生产消费队列”；
+eg: BlockingQueue<Functor> taskQueue;//typedef boost::function<void ()>Functor
+eg: BlockingQueue<DataClass> ConsumerProducerQueue;
+
+C++技法：smart pointer, bind/function(只看接口，与类无关),
+  使用 boost::function + boost::bind 取代虚函数，很多设计模式也可以被(function&bind)取代,可以做到真正的面向接口编程;
+  在单元测试的时候，可以很容易通过bind/function来mock某个函数的实现，简化测试依赖，同时避免在现有代码中添加仅仅为了测试才用的代码；
+
+C++单遍编译：编译器在读到一个函数调用语句时，只能从目前已看到的同名函数中选出最佳函数，哪怕后面出现了更合适的匹配也不能改变之前的决定；这样做是为了兼容C语言；
+几乎每个编程规范都会建议尽量使用类型前向声明来减少编译期依赖；
+C语言链接模型：越基础的库放到后面；
+
+C++中的值语义： 拷贝后的对象与原来的对象无关：
+  1）基本类型（int/bool/double/char）;2)STL容器vector/map/string;
+  3)unique_ptr/shared_ptr/weak_ptr(一般作为栈对象，子对象，或容器元素)，注意，如果这几种指针是classX的子对象，且它的模板参数T是incompleteType,那么classX的析构函数必须在cpp显示定义，否则报错；
+
+几个smart pointer的区别(系统的避免各类指针错误)：
+  (shared_ptr-强引用,weak_ptr-弱引用),用于避免野指针/空悬指针；目前还不支持shared_ptr<A[]>   
+  scoped_ptr:避免重复释放和内存泄露，被unique_ptr取代了；
+  unique_ptr 在析构函数中释放资源， unique_ptr<A[]>可以在析构函数中释放整个对象数组
+  auto_ptr(移动语义)已经被 unique_ptr 取代了；
+  observer_ptr VS weak_ptr :可以判断所指对象是否还存在；
+  用std::vector替换new[]/delete[]；
+建议用以上smart pointer来代替raw pointer;
+
+网络编程常见陷阱common pitfall:
+    1)sending c struct msg to peer,hard to extend;
+    2)tcp self-connection
+    3)incorrectly determine message boundary as tcp is byte stream;
+    4)incomplete data received from a tcp peer;
+    5)mix business logical with network IO, difficult to unit test
+
+
+常见的并发网络编程模型：12种，Page161,    oneloopPerThread(reactors in threads)+IOMultiplexing:将poll/epoll得到的事件分发给threadpool处理；
+反射：根据类型的名字(string)来创建该类型的对象实例：其实是先建立一个映射表map(className---static_Class_Instances*)，然后根据name查表得到该实例obj(default)，再调用obj.create接口创建新的对象；
+
+
+
+TCP编程的3个经典例子： echo/chat/proxy
+  1)echo:服务器被动接收新连接，收发数据，被动处理连接断开，连接之间独立，没有关联；
+  2)chat:connection 之间的数据有交换，对连接的管理比echo复杂；
+  3)proxy:连接的管理比较复杂，要被动接受，主动发起连接，还要主动关闭，被动关闭连接；
+  4)学习sockets API的利器:IPython 用于写网络测试程序；
+
+__thread : 定义线程级别的全局变量，只能用于POD类型(int, char, *)，不能用于class类型，只能用常量初始化，如果不加这个关键字就是进程级别的；
+
+
+//////////C++项目经验：
+0.yum install libboost-all-dev;
+  ubuntu: sudo apt-get install libboost-all-dev;安装所有的boost库,安装后在/usr/lib/x86_64-linux-gnu/libboost*
+  apt-cache search libboost 本地搜索libboost相关的库
+  apt-cache search .  搜索所有的package;
+1.网络库(采用reactor框架)： muduo(擅长TCP长连接), libevent2,ACE,Netty(java), boost.Asio ，事件驱动，非阻塞，
+  目前高性能Http服务器普遍采用单线程Reactor方案，
+
+2.程序的性能瓶颈：CPU，DISK IO，数据库，网络IO；只有对领域有深入的了解，才能做出针对性的优化；
+2.会用Tcpdump，熟悉TCPIP协议非常有助于分析解决线上问题；熟悉socketAPI的返回错误码也很重要；
+
+2.一般来说，非阻塞网络编程中，难度：正确处理数据发送  > 接收，因为发送的时候要考虑对方接收缓慢的情况；关闭连接 > 建立连接，
+协议设计是网络编程的核心，消息内容 > 消息格式(xml,json,protobuf)
+
+1.logging： 不要用iostream,自己写一个LogStream+重载operator<<操作符，轻松做到线程安全与高效，参考第5章；
+2.File操作： 自己写个FileClass,把用到的文件IO功能用RAII手法封装，继承boost::noncopyable,在析构函数中释放资源，这样可以避免很多C语言文件操作的常见错误；
+
+3.进程间通信只使用TCP Socket,可以跨主机（无论是单机还是分布式），具有伸缩性，其它的IPC机制(管道，共享内存，消息队列，信号signal)只能用于单机，不能跨OS通信; 
+   Linux上进程退出时所有资源都会被回收(eg: heap memory)，除了跨进程的资源;进程不能跨越OS边界；
+  另外一个原因是(page355)：使用TCP，进程一旦异常退出，连接与端口自动关闭，然后另一方可以重建连接，恢复通信； 而pipe是无法重建的，对于共享内存，进程意外终止的话无法清理资源，无法解锁；
+4.多线程编程建议： 用流水线，生产者-消费者，taskqueue,这些有规律的机制，最低限度的共享数据(参考函数runInloop())，尽量减少使用跨线程的对象； 
+  尽量用高级同步方式(线程池，消息队列，CountDownLatch),剩下的用mutex/condition, 尽量用RAII 手法和ScopedLocking;
+  CountDownLatch本身是由MutexLock+Condition 实现的；
+
+7.多线程IO(4.6)：每个文件描述符(fd)只由1个线程操作，从而避免了消息收发的顺序问题（多线程下），也避免了关闭fd导致的race condition,
+  1个线程可以操作多个fd,但1个fd的owner只有1个线程;所以，应该把对同一个epoll_fd的操作（添加，删除，修改，等待）都放到同一个线程；
+
+5.最常用的Pthread函数就11个，在C++中一般封装后用，比如：muduo::MutexLock(mutex创建、销毁、lock，unlock)/Condition(创建，消费，wait,signal,broadcast)/Thread(create,join),
+  只用这3样(mutex/condition/thread)可以完成任何多线程编程，当然实际中会使用更高级的封装，比如mutex::ThreadPool/CountDownLatch; 默认的mutex是不可重入的，非递归锁；
+  不建议使用：pthread_rwlock,sem_*信号量，pthread_{cancel,kill}
+
+6.不必担心系统调用的线程安全性，因为系统调用对用户态程序来说是原子的，但是要注意系统调用如果改变了内核状态，可能影响其他线程；
+
+8.基于事件驱动callback的单线程非阻塞IO也能够应对高并发场景；
+
+9.自旋锁：适用于任何锁持有时间少于线程阻塞和唤醒消耗时间 的场合，且是多核；
+
+10.不手工调用lock/unlock(),应该由栈上的lockGuard对象的构造/析构函数负责（RAII封装mutex的创建销毁加锁解锁），对象的作用域正好等于临界区，始终保证在同一个scope里加锁解锁，避免在不同的分支加锁解锁，避免在不同的函数加锁解锁；这种做法叫做scopedLocking;
+
+11.Linux上的线程标示： pthread_self返回的可能是个指针，不能跨进程使用，建议使用gettid()系统调用返回线程id并使用__thread全局变量保存, 是个整数，内核采用递增轮回的方式复用。
+
+12.对于TCP，尽量保证一个socket文件描述符只在一个线程内读写，不要跨线程（虽然read/write是原子，但多线程调用会导致应用层消息很难恢复）， 由于UDP协议保证了消息的原子性，可以多个线程同时读写一个udp socket fid;      
+对于磁盘文件，多线程可以调pread/pwrite读写同一个文件；注意：TCP连接的数据只能读1次；
+
+13.STL容器不是线程安全的（如果跨线程使用需要同步机制），系统调用对用户态程序来说是原子性的，也是线程安全的（除了少量的系统调用修改了全局状态），glibc库函数是线程安全的因为是纯函数。
+
+14.如果业务允许的话，始终按对象地址大小加锁可以保证加锁顺序的一致性。
+
+15.阻抗匹配原则：IO线程和working线程的数量，另外，还要考虑特殊线程logging对系统容量的影响；
+
+16.尽量提供静态库，因为动态库的虚函数二进制兼容具有本质困难(会引入链式继承和多重继承)，如果要支持hot fix，只能选择动态库，而且不要使用虚函数作为库的接口，建议namespace级别全局函数或non-virtual成员函数作为接口（pimp技法），在分布式系统尽量采用静态库支持灵活部署.
+     动态库的改动的一些安全做法（不会影响已有的程序）：增加新的class, 增加non-virtual成员函数或者static成员函数，数据成员重命名（函数重命名不行）；
+动态库接口推荐做法：1）如果小范围内使用，用库版本管理工具；2）如果范围比较广，使用pimp技法（面向用户的class没有虚函数，只包含1个数据成员Imp*），这样可以随意添加新功能且不破坏二进制兼容性；3）如果要跨语言，只能暴露C语言接口，Java/python/C++都能调用C语言接口，C函数是Linux下的万能接口；
+non-virtual之所以比virtual函数健壮是因为 virtual function 是 bind- by-vtable-offset(declare order)， 而 non-virtual function 是 bind-by-name;
+Java把link这步推迟到了class loading，不存在兼容性问题，因此在Java中使用面向接口编程更自然，不像C++那么别扭；
+
+17.虚函数：虚函数作为接口有2个用途：a)给用户使用; b)回调，用户继承并重新实现接口，给框架使用；对于回调，C++11用bind+function代替虚函数这种过时做法，muduo源码基本都是用function来作为回调函数的;
+
+14.书中用到的函数：
+注意：pthread_create等是库函数，不是系统调用，内部实现调用了system_call;
+Internet address manipulation routines :  inet_aton, inet_addr, inet_network, inet_ntoa, inet_makeaddr, inet_lnaof, inet_netof 
+3种 fd: socketfd, eventfd, timerfd;
+pthread_mutex_lock(pthread_mutex_t *mutex); 这是C风格，对应C++的mutex.lock();
+::eventfd(0, EFD_NONBLOCK | EFD_CLOEXEC); 新建本地fd,这个fd的读写一般都是完整读写而且不阻塞，和socketfd不同，socketfd会由于内核缓冲区和网络出现不完整读写；
+::poll(pollfds_.data(), pollfds_.size(), timeoutMs);
+epollfd =::epoll_create1(EPOLL_CLOEXEC);
+::epoll_wait(epollfd, epoll_event*, num, timeout);
+::epoll_ctl(epollfd, EPOLL_CTL_ADD, fd, &event);
+
+::syscall(SYS_gettid), getenv(str)
+timerfd = ::timerfd_create(CLOCK_MONOTONIC, TFD_NONBLOCK | TFD_CLOEXEC); 创建时没有设置超时时间，这时不会收到任何IO事件，效果类似于fd=-1;
+timespec表示nanosecond.
+gettimeofday(&timeval, NULL);
+::timerfd_settime(timerfd, 0, &newValue, &oldValue);//设置timerfd的超时时间,设置后才会触发POLLIN事件;
+shared_from_this()//return shared_ptr(this), to use this function need public derive : enable_share_from_this<T>;
+shared_ptr<Observer> obj(weakptr->lock()); 这一步是线程安全的, if(obj)成立则可以不用担心对象被其它线程析构；
+shared_ptr本身的线程安全和STL容器一样，如果多个线程同时访问同一个shared_ptr（比如全局shared_ptr）, 则需要加锁；
+
+15.muduo源码剖析:
+0) 1 sockfd --- 1 Socket --- 1 Channel --- 1 TcpConnection ---1 inputbuffer&&outputbuffer;  
+    1 thread---    1 EventLoop ---1 poller ---- N channel;
+    1 TcpServer --1 Acceptor---1 threadpool ---N threads --- N loops;
+    1 Tcpclient ---1 loop----1 connector ---1 temp_TcpConnection + 1 data_TcpConnection;
+1)EventLoop::wakeup(), 线程间通信用socketfd, 不用condition;
+2)EventLoop 有自己的owner线程，但是其它线程可以通过runInLoop(task)往该线程增加task, 这样就可以避免多线程竞争;
+3)channel type and owner class: acceptChannel(Acceptor,listenfd), wakeupChannel(Eventloop, eventfd), timerfdChannel(timerQueue,timerfd), 
+dataChannel(TcpConnection,sockfd), clientChannel(Connector, clientfd) , 
+不同的fd之所以可以表现不同的行为是因为fd的创建函数不同或者绑定了系统调用，这些隐藏属性由内核管理，用户看到的都是int fd;
+4)用户提供的回调函数都必须是非阻塞的；
+5)timerQueue_并没有像pendingFunctors_一样使用专门的mutex保护，而是通过把addTimerInLoop变成1个task来执行，这样就可以在当前线程操作timerQueue_,因此有两种同步机制：
+  a)mutex ; b)runInLoop; 后者的性能更好因为浪费在等待的时间上更少;
+///////////////////////////////////muduo use guide
+1.if directly run ./build.sh fail and point out not found cmake tool, then need install cmake first, there is a guide about how to install cmake:
+
+2.run "locate libboost" to find if there already installed boost library.
+  if yes, then write a simple program to test boost lib availble use or not.
+3.then run ./build.sh to compile, after compile run 'make test' for ut. 
+
+/////////////////////////////////////////////////////////////////////////////////install cmake in linux
+sudo apt-get install build-essential
+wget http://www.cmake.org/files/v3.2/cmake-3.2.2.tar.gz
+tar xf cmake-3.2.2.tar.gz
+cd cmake-3.2.2
+./configure
+make
+
+sudo make install     
+/////////////////////////////////////////////////////////参考资料
+《Linux 多线程服务端编程，使用muduo C++网络库》关键章节4.6多线程与IO，6.4.1TCP网络编程本质，
+《C++ Concurrency in action: practical multithreading》非常好的C++多线程书籍;
+
+https://github.com/lianzeng/Cpp-Concurrency-in-Action  源代码
+https://github.com/xiaoweiChen/Cpp_Concurrency_In_Action :中文翻译的不好
+https://github.com/chenshuo/muduo  使用boost+pthread编写，计划用C++11的thread库改造：shared_ptr + function + std::thread
+http://man7.org/linux/man-pages/man2/poll.2.html  linux system function manual search, eg: poll
+http://pubs.opengroup.org/onlinepubs/9699919799/   linux system function
+https://www.die.net/    linux api search;
+
+ 《Linux 多线程服务端编程，使用muduo C++网络库》 非常好，介绍了很多作者经验（多线程，C++理解），不过这本书的内容并没有用到C++11 里面的线程库，而是用老的<pthread.h>
+ 作者推荐的几本网络编程书：《TCP/IP详解 卷1：协议》17-24章， 《UNIX网络编程：卷1 套接字联网API》-面向程序员， 《Effective TCP/IP programming》-专家经验总结
+ 《C++ Network Programming》共2卷，介绍ACE，一个经典的网络框架
+  《Pattern-Oriented Software Architecture Volume2:Patterns for Concurrent and Networked Objects》强调模块化，业务与网络功能分离，总结了开发并发网络程序的模式；
+
+C++书籍推荐：
+<Effective C++ 中文第3版> <C++编程规范>Herb Sutter刘基诚（译）；
+编程规范：STL容器中优先考虑vector,其次再选择适当的容器，容器内只可放value和smart pointer，不能放original pointer;
+ 在函数里面定义个临时vector对象，不会导致栈溢出，vector是用的堆内存
