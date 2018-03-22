@@ -18,6 +18,8 @@ linux multi thread programming in C++11.
 
 8)User call TcpConnection::send(msg) to send msg, and provide Callback to process peer msg(refer to multiThread/libnet/test/TestEchoClient.cpp).
 
+9).It's easy to learn the message flow from EchoClient.log and EchoServer.log;
+
 
 
 # This project is build on following environment:
