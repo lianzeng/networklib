@@ -16,7 +16,7 @@ linux multi thread programming in C++11.
 
 7)test cases could run independently, with valgrind memory detect;
 
-8)User call TcpConnection::send(msg) to send msg, and provide MessageCallback to process peer msg(refer to Callback.hpp).
+8)User call TcpConnection::send(msg) to send msg, and provide Callback to process peer msg(refer to multiThread/libnet/test/TestEchoClient.cpp).
 
 
 
