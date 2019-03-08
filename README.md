@@ -4,11 +4,11 @@ linux multi thread programming in C++11.
 
 1)IO multiplexing: poll, epoll;
 
-2)use nonblock IO, fd type: socketfd, timerfd, eventfd, listenfd;
+2)use nonblock IO, support fd type: socketfd, timerfd, eventfd, listenfd;  provide a unify framework for timer,socket,signal processing.
 
 3)one IO/Event loop per thread + reactor(callback), using std::bind + std::function to implement callback;
 
-4)tcp connections are balanced among threads
+4)tcp connections are balanced among threads;
 
 5)the tcp server has 1 acceptor thread + event_loop_thread_pool;
 
